@@ -1,0 +1,76 @@
+
+
+services:
+  productservice-backend:
+    container_name: productservice-backend-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      ssh:
+        - default  # enable SSH forwarding for private repos
+    environment:
+      - postgresMasterAddr=${POSTGRES_MASTER_ADDR:-postgres:5432}
+      - postgresMasterDb=${POSTGRES_MASTER_DB:-tailhail_de13}
+      - postgresMasterHost=${POSTGRES_MASTER_HOST:-postgres}
+      - postgresMasterPassword=${POSTGRES_MASTER_PASSWORD:-postgres}
+      - postgresMasterPort=${POSTGRES_MASTER_PORT:-5432}
+      - postgresMasterUser=${POSTGRES_MASTER_USER:-postgres}
+      - postgresSlaveAddr=${POSTGRES_SLAVE_ADDR:-postgres:5432}
+      - postgresSlaveDb=${POSTGRES_SLAVE_DB:-tailhail_de13}
+      - postgresSlaveHost=${POSTGRES_SLAVE_HOST:-postgres}
+      - postgresSlavePassword=${POSTGRES_SLAVE_PASSWORD:-postgres}
+      - postgresSlavePort=${POSTGRES_SLAVE_PORT:-5432}
+      - postgresSlaveUser=${POSTGRES_SLAVE_USER:-postgres}
+      - redisAddress=${REDIS_ADDRESS:-redis:6379}
+      - jwtKeyAccess=${JWT_KEY_ACCESS:-0mLXs)x^&zhcYng[9?BKyXT$E5FALX3{#`_h@63\CF>#5-&d7s}
+      - jwtKeyRefresh=${JWT_KEY_REFRESH:-E[F[8]_ER'x"ZER8g#Xyh7q{,2q2Uq:+N']r>r"#LL]:A*)z)L}
+      - salt=${SALT:-test-salt}
+      - appUrl=${APP_URL:-http://localhost:9090}
+      - authDocsApiKey=${AUTH_DOCS_API_KEY:-test-key}
+      - docserviceAddress=${DOCSERVICE_ADDRESS:-localhost:50052}
+      - docserviceServername=${DOCSERVICE_SERVERNAME:-localhost}
+      - customerServiceAddress=${CUSTOMER_SERVICE_ADDRESS:-localhost:50053}
+      - customerServiceServername=${CUSTOMER_SERVICE_SERVERNAME:-localhost}
+      - tlsCrt=${TLS_CRT}
+      - tlsKey=${TLS_KEY}
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "${REST_PORT:-9090}:9090"
+      - "${GRPC_PORT:-9091}:9091"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: productservice-db-container
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_MASTER_DB:-tailhail_de13}
+      POSTGRES_USER: ${POSTGRES_MASTER_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_MASTER_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_MASTER_USER:-postgres} -d ${POSTGRES_MASTER_DB:-tailhail_de13}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: productservice-redis-container
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+

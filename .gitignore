@@ -1,0 +1,53 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+*.iml
+*.ipr
+*.iws
+*.env
+*.pem
+.idea/
+config.yaml
+config-local.yaml
+config.grasp.yaml
+config_prod.yaml
+config_dmortgages.yaml
+bin/
+pkg/
+**/github.com/
+.DS_Store
+main
+drivers/ssl/bhj
+sqlboiler.toml
+build_environment_vars.py
+compare_yaml.py
+export_env.sh
+id_rsa
+local.certs
+macDockerfile
+
+user-service
+run.sh
+drop.sh
+export.sh
+.vscode/
+do-1.yaml
+.env.meles
+CLAUDE.md
+encrypt_password.go
+.claude/
+python_test
+config-kube.yaml
