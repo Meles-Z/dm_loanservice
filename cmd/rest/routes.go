@@ -24,9 +24,16 @@ func initRoutes(ctx context.Context, e ie.Endpoints) *mux.Router {
 	// account
 	accountRoutes := r.PathPrefix("/api/v1/account").Subrouter()
 	accountRoutes.Handle("", ithttp.MakeAccountAddHandler((e.AccountAdd))).Methods(http.MethodPost)
-	accountRoutes.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeAccountReadHandler(middleware.AuthMiddleware()(e.AccountRead))).Methods(http.MethodGet)
+	accountRoutes.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeAccountReadHandler((e.AccountRead))).Methods(http.MethodGet)
 	accountRoutes.Handle("/arrears/recent", ithttp.MakeAccountRecentArrearsHandler(e.RecentArrears)).Methods(http.MethodGet)
 	accountRoutes.Handle("/analytics/mortgage-performance", ithttp.MakeAccountMortgagePerformanceHandler(e.MortgagePerformance)).Methods(http.MethodGet)
+	accountRoutes.Handle("/{id:[0-9a-fA-F-]+}/due-diligence", ithttp.MakeDueDiligenceByAccountHandler((e.DueDiligenceByAccount))).Methods(http.MethodGet)
+	accountRoutes.Handle("/{id:[0-9a-fA-F-]+}/due-diligence", ithttp.MakeDueDiligenceUpdateHandler((e.DueDiligenceUpdate))).Methods(http.MethodPut)
+
+	// due diligence
+	duediligenceRoutes := r.PathPrefix("/api/v1/due-diligence").Subrouter()
+	duediligenceRoutes.Handle("", ithttp.MakeDueDiligenceAddHandler((e.DueDiligenceAdd))).Methods(http.MethodPost)
+	duediligenceRoutes.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeDueDiligenceReadHandler((e.DueDiligenceRead))).Methods(http.MethodGet)
 
 	// late fee rule
 	lateFeeRuleRouter := r.PathPrefix("/api/v1/late-fee-rule").Subrouter()

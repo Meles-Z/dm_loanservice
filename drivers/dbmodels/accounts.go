@@ -180,37 +180,6 @@ var AccountTableColumns = struct {
 
 // Generated where
 
-type whereHelperstring struct{ field string }
-
-func (w whereHelperstring) EQ(x string) qm.QueryMod      { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperstring) NEQ(x string) qm.QueryMod     { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperstring) LT(x string) qm.QueryMod      { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperstring) LTE(x string) qm.QueryMod     { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperstring) GT(x string) qm.QueryMod      { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperstring) GTE(x string) qm.QueryMod     { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperstring) LIKE(x string) qm.QueryMod    { return qm.Where(w.field+" LIKE ?", x) }
-func (w whereHelperstring) NLIKE(x string) qm.QueryMod   { return qm.Where(w.field+" NOT LIKE ?", x) }
-func (w whereHelperstring) ILIKE(x string) qm.QueryMod   { return qm.Where(w.field+" ILIKE ?", x) }
-func (w whereHelperstring) NILIKE(x string) qm.QueryMod  { return qm.Where(w.field+" NOT ILIKE ?", x) }
-func (w whereHelperstring) SIMILAR(x string) qm.QueryMod { return qm.Where(w.field+" SIMILAR TO ?", x) }
-func (w whereHelperstring) NSIMILAR(x string) qm.QueryMod {
-	return qm.Where(w.field+" NOT SIMILAR TO ?", x)
-}
-func (w whereHelperstring) IN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
 type whereHelpertypes_Decimal struct{ field string }
 
 func (w whereHelpertypes_Decimal) EQ(x types.Decimal) qm.QueryMod {
@@ -326,124 +295,6 @@ func (w whereHelpertypes_NullDecimal) IsNotNull() qm.QueryMod {
 	return qmhelper.WhereIsNotNull(w.field)
 }
 
-type whereHelpernull_Int struct{ field string }
-
-func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
-type whereHelpernull_String struct{ field string }
-
-func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_String) LIKE(x null.String) qm.QueryMod {
-	return qm.Where(w.field+" LIKE ?", x)
-}
-func (w whereHelpernull_String) NLIKE(x null.String) qm.QueryMod {
-	return qm.Where(w.field+" NOT LIKE ?", x)
-}
-func (w whereHelpernull_String) ILIKE(x null.String) qm.QueryMod {
-	return qm.Where(w.field+" ILIKE ?", x)
-}
-func (w whereHelpernull_String) NILIKE(x null.String) qm.QueryMod {
-	return qm.Where(w.field+" NOT ILIKE ?", x)
-}
-func (w whereHelpernull_String) SIMILAR(x null.String) qm.QueryMod {
-	return qm.Where(w.field+" SIMILAR TO ?", x)
-}
-func (w whereHelpernull_String) NSIMILAR(x null.String) qm.QueryMod {
-	return qm.Where(w.field+" NOT SIMILAR TO ?", x)
-}
-func (w whereHelpernull_String) IN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelpernull_String) NIN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
-type whereHelpernull_Time struct{ field string }
-
-func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var AccountWhere = struct {
 	ID                  whereHelperstring
 	CustomerID          whereHelperstring
@@ -506,35 +357,38 @@ var AccountWhere = struct {
 
 // AccountRels is where relationship names are stored.
 var AccountRels = struct {
-	Customer            string
-	Product             string
-	LateFeeCalculations string
-	Loanauditlogs       string
-	Loanflags           string
-	Overpayments        string
-	PaymentAdjustments  string
-	Payments            string
+	Customer                   string
+	Product                    string
+	AccountFlags               string
+	Duediligencechecklistitems string
+	LateFeeCalculations        string
+	Loanauditlogs              string
+	Overpayments               string
+	PaymentAdjustments         string
+	Payments                   string
 }{
-	Customer:            "Customer",
-	Product:             "Product",
-	LateFeeCalculations: "LateFeeCalculations",
-	Loanauditlogs:       "Loanauditlogs",
-	Loanflags:           "Loanflags",
-	Overpayments:        "Overpayments",
-	PaymentAdjustments:  "PaymentAdjustments",
-	Payments:            "Payments",
+	Customer:                   "Customer",
+	Product:                    "Product",
+	AccountFlags:               "AccountFlags",
+	Duediligencechecklistitems: "Duediligencechecklistitems",
+	LateFeeCalculations:        "LateFeeCalculations",
+	Loanauditlogs:              "Loanauditlogs",
+	Overpayments:               "Overpayments",
+	PaymentAdjustments:         "PaymentAdjustments",
+	Payments:                   "Payments",
 }
 
 // accountR is where relationships are stored.
 type accountR struct {
-	Customer            *Customer               `boil:"Customer" json:"Customer" toml:"Customer" yaml:"Customer"`
-	Product             *Product                `boil:"Product" json:"Product" toml:"Product" yaml:"Product"`
-	LateFeeCalculations LateFeeCalculationSlice `boil:"LateFeeCalculations" json:"LateFeeCalculations" toml:"LateFeeCalculations" yaml:"LateFeeCalculations"`
-	Loanauditlogs       LoanauditlogSlice       `boil:"Loanauditlogs" json:"Loanauditlogs" toml:"Loanauditlogs" yaml:"Loanauditlogs"`
-	Loanflags           LoanflagSlice           `boil:"Loanflags" json:"Loanflags" toml:"Loanflags" yaml:"Loanflags"`
-	Overpayments        OverpaymentSlice        `boil:"Overpayments" json:"Overpayments" toml:"Overpayments" yaml:"Overpayments"`
-	PaymentAdjustments  PaymentAdjustmentSlice  `boil:"PaymentAdjustments" json:"PaymentAdjustments" toml:"PaymentAdjustments" yaml:"PaymentAdjustments"`
-	Payments            PaymentSlice            `boil:"Payments" json:"Payments" toml:"Payments" yaml:"Payments"`
+	Customer                   *Customer                      `boil:"Customer" json:"Customer" toml:"Customer" yaml:"Customer"`
+	Product                    *Product                       `boil:"Product" json:"Product" toml:"Product" yaml:"Product"`
+	AccountFlags               AccountFlagSlice               `boil:"AccountFlags" json:"AccountFlags" toml:"AccountFlags" yaml:"AccountFlags"`
+	Duediligencechecklistitems DuediligencechecklistitemSlice `boil:"Duediligencechecklistitems" json:"Duediligencechecklistitems" toml:"Duediligencechecklistitems" yaml:"Duediligencechecklistitems"`
+	LateFeeCalculations        LateFeeCalculationSlice        `boil:"LateFeeCalculations" json:"LateFeeCalculations" toml:"LateFeeCalculations" yaml:"LateFeeCalculations"`
+	Loanauditlogs              LoanauditlogSlice              `boil:"Loanauditlogs" json:"Loanauditlogs" toml:"Loanauditlogs" yaml:"Loanauditlogs"`
+	Overpayments               OverpaymentSlice               `boil:"Overpayments" json:"Overpayments" toml:"Overpayments" yaml:"Overpayments"`
+	PaymentAdjustments         PaymentAdjustmentSlice         `boil:"PaymentAdjustments" json:"PaymentAdjustments" toml:"PaymentAdjustments" yaml:"PaymentAdjustments"`
+	Payments                   PaymentSlice                   `boil:"Payments" json:"Payments" toml:"Payments" yaml:"Payments"`
 }
 
 // NewStruct creates a new relationship struct
@@ -574,6 +428,38 @@ func (r *accountR) GetProduct() *Product {
 	return r.Product
 }
 
+func (o *Account) GetAccountFlags() AccountFlagSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetAccountFlags()
+}
+
+func (r *accountR) GetAccountFlags() AccountFlagSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.AccountFlags
+}
+
+func (o *Account) GetDuediligencechecklistitems() DuediligencechecklistitemSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetDuediligencechecklistitems()
+}
+
+func (r *accountR) GetDuediligencechecklistitems() DuediligencechecklistitemSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.Duediligencechecklistitems
+}
+
 func (o *Account) GetLateFeeCalculations() LateFeeCalculationSlice {
 	if o == nil {
 		return nil
@@ -604,22 +490,6 @@ func (r *accountR) GetLoanauditlogs() LoanauditlogSlice {
 	}
 
 	return r.Loanauditlogs
-}
-
-func (o *Account) GetLoanflags() LoanflagSlice {
-	if o == nil {
-		return nil
-	}
-
-	return o.R.GetLoanflags()
-}
-
-func (r *accountR) GetLoanflags() LoanflagSlice {
-	if r == nil {
-		return nil
-	}
-
-	return r.Loanflags
 }
 
 func (o *Account) GetOverpayments() OverpaymentSlice {
@@ -1008,6 +878,34 @@ func (o *Account) Product(mods ...qm.QueryMod) productQuery {
 	return Products(queryMods...)
 }
 
+// AccountFlags retrieves all the account_flag's AccountFlags with an executor.
+func (o *Account) AccountFlags(mods ...qm.QueryMod) accountFlagQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"account_flags\".\"account_id\"=?", o.ID),
+	)
+
+	return AccountFlags(queryMods...)
+}
+
+// Duediligencechecklistitems retrieves all the duediligencechecklistitem's Duediligencechecklistitems with an executor.
+func (o *Account) Duediligencechecklistitems(mods ...qm.QueryMod) duediligencechecklistitemQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"duediligencechecklistitems\".\"account_id\"=?", o.ID),
+	)
+
+	return Duediligencechecklistitems(queryMods...)
+}
+
 // LateFeeCalculations retrieves all the late_fee_calculation's LateFeeCalculations with an executor.
 func (o *Account) LateFeeCalculations(mods ...qm.QueryMod) lateFeeCalculationQuery {
 	var queryMods []qm.QueryMod
@@ -1034,20 +932,6 @@ func (o *Account) Loanauditlogs(mods ...qm.QueryMod) loanauditlogQuery {
 	)
 
 	return Loanauditlogs(queryMods...)
-}
-
-// Loanflags retrieves all the loanflag's Loanflags with an executor.
-func (o *Account) Loanflags(mods ...qm.QueryMod) loanflagQuery {
-	var queryMods []qm.QueryMod
-	if len(mods) != 0 {
-		queryMods = append(queryMods, mods...)
-	}
-
-	queryMods = append(queryMods,
-		qm.Where("\"loanflags\".\"account_id\"=?", o.ID),
-	)
-
-	return Loanflags(queryMods...)
 }
 
 // Overpayments retrieves all the overpayment's Overpayments with an executor.
@@ -1332,6 +1216,232 @@ func (accountL) LoadProduct(ctx context.Context, e boil.ContextExecutor, singula
 	return nil
 }
 
+// LoadAccountFlags allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (accountL) LoadAccountFlags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
+	var slice []*Account
+	var object *Account
+
+	if singular {
+		var ok bool
+		object, ok = maybeAccount.(*Account)
+		if !ok {
+			object = new(Account)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
+			}
+		}
+	} else {
+		s, ok := maybeAccount.(*[]*Account)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &accountR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &accountR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`account_flags`),
+		qm.WhereIn(`account_flags.account_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load account_flags")
+	}
+
+	var resultSlice []*AccountFlag
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice account_flags")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on account_flags")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for account_flags")
+	}
+
+	if len(accountFlagAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.AccountFlags = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &accountFlagR{}
+			}
+			foreign.R.Account = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.AccountID {
+				local.R.AccountFlags = append(local.R.AccountFlags, foreign)
+				if foreign.R == nil {
+					foreign.R = &accountFlagR{}
+				}
+				foreign.R.Account = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadDuediligencechecklistitems allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (accountL) LoadDuediligencechecklistitems(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
+	var slice []*Account
+	var object *Account
+
+	if singular {
+		var ok bool
+		object, ok = maybeAccount.(*Account)
+		if !ok {
+			object = new(Account)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
+			}
+		}
+	} else {
+		s, ok := maybeAccount.(*[]*Account)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &accountR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &accountR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`duediligencechecklistitems`),
+		qm.WhereIn(`duediligencechecklistitems.account_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load duediligencechecklistitems")
+	}
+
+	var resultSlice []*Duediligencechecklistitem
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice duediligencechecklistitems")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on duediligencechecklistitems")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for duediligencechecklistitems")
+	}
+
+	if len(duediligencechecklistitemAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Duediligencechecklistitems = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &duediligencechecklistitemR{}
+			}
+			foreign.R.Account = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.AccountID {
+				local.R.Duediligencechecklistitems = append(local.R.Duediligencechecklistitems, foreign)
+				if foreign.R == nil {
+					foreign.R = &duediligencechecklistitemR{}
+				}
+				foreign.R.Account = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // LoadLateFeeCalculations allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (accountL) LoadLateFeeCalculations(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
@@ -1548,119 +1658,6 @@ func (accountL) LoadLoanauditlogs(ctx context.Context, e boil.ContextExecutor, s
 				local.R.Loanauditlogs = append(local.R.Loanauditlogs, foreign)
 				if foreign.R == nil {
 					foreign.R = &loanauditlogR{}
-				}
-				foreign.R.Account = local
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadLoanflags allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (accountL) LoadLoanflags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
-	var slice []*Account
-	var object *Account
-
-	if singular {
-		var ok bool
-		object, ok = maybeAccount.(*Account)
-		if !ok {
-			object = new(Account)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
-			}
-		}
-	} else {
-		s, ok := maybeAccount.(*[]*Account)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
-			}
-		}
-	}
-
-	args := make(map[interface{}]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &accountR{}
-		}
-		args[object.ID] = struct{}{}
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &accountR{}
-			}
-			args[obj.ID] = struct{}{}
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]interface{}, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`loanflags`),
-		qm.WhereIn(`loanflags.account_id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load loanflags")
-	}
-
-	var resultSlice []*Loanflag
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice loanflags")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on loanflags")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for loanflags")
-	}
-
-	if len(loanflagAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-	if singular {
-		object.R.Loanflags = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &loanflagR{}
-			}
-			foreign.R.Account = object
-		}
-		return nil
-	}
-
-	for _, foreign := range resultSlice {
-		for _, local := range slice {
-			if local.ID == foreign.AccountID {
-				local.R.Loanflags = append(local.R.Loanflags, foreign)
-				if foreign.R == nil {
-					foreign.R = &loanflagR{}
 				}
 				foreign.R.Account = local
 				break
@@ -2104,6 +2101,112 @@ func (o *Account) SetProduct(ctx context.Context, exec boil.ContextExecutor, ins
 	return nil
 }
 
+// AddAccountFlags adds the given related objects to the existing relationships
+// of the account, optionally inserting them as new records.
+// Appends related to o.R.AccountFlags.
+// Sets related.R.Account appropriately.
+func (o *Account) AddAccountFlags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AccountFlag) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.AccountID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"account_flags\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
+				strmangle.WhereClause("\"", "\"", 2, accountFlagPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.AccountID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &accountR{
+			AccountFlags: related,
+		}
+	} else {
+		o.R.AccountFlags = append(o.R.AccountFlags, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &accountFlagR{
+				Account: o,
+			}
+		} else {
+			rel.R.Account = o
+		}
+	}
+	return nil
+}
+
+// AddDuediligencechecklistitems adds the given related objects to the existing relationships
+// of the account, optionally inserting them as new records.
+// Appends related to o.R.Duediligencechecklistitems.
+// Sets related.R.Account appropriately.
+func (o *Account) AddDuediligencechecklistitems(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Duediligencechecklistitem) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.AccountID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"duediligencechecklistitems\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
+				strmangle.WhereClause("\"", "\"", 2, duediligencechecklistitemPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.AccountID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &accountR{
+			Duediligencechecklistitems: related,
+		}
+	} else {
+		o.R.Duediligencechecklistitems = append(o.R.Duediligencechecklistitems, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &duediligencechecklistitemR{
+				Account: o,
+			}
+		} else {
+			rel.R.Account = o
+		}
+	}
+	return nil
+}
+
 // AddLateFeeCalculations adds the given related objects to the existing relationships
 // of the account, optionally inserting them as new records.
 // Appends related to o.R.LateFeeCalculations.
@@ -2201,59 +2304,6 @@ func (o *Account) AddLoanauditlogs(ctx context.Context, exec boil.ContextExecuto
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &loanauditlogR{
-				Account: o,
-			}
-		} else {
-			rel.R.Account = o
-		}
-	}
-	return nil
-}
-
-// AddLoanflags adds the given related objects to the existing relationships
-// of the account, optionally inserting them as new records.
-// Appends related to o.R.Loanflags.
-// Sets related.R.Account appropriately.
-func (o *Account) AddLoanflags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Loanflag) error {
-	var err error
-	for _, rel := range related {
-		if insert {
-			rel.AccountID = o.ID
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		} else {
-			updateQuery := fmt.Sprintf(
-				"UPDATE \"loanflags\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
-				strmangle.WhereClause("\"", "\"", 2, loanflagPrimaryKeyColumns),
-			)
-			values := []interface{}{o.ID, rel.ID}
-
-			if boil.IsDebug(ctx) {
-				writer := boil.DebugWriterFrom(ctx)
-				fmt.Fprintln(writer, updateQuery)
-				fmt.Fprintln(writer, values)
-			}
-			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-				return errors.Wrap(err, "failed to update foreign table")
-			}
-
-			rel.AccountID = o.ID
-		}
-	}
-
-	if o.R == nil {
-		o.R = &accountR{
-			Loanflags: related,
-		}
-	} else {
-		o.R.Loanflags = append(o.R.Loanflags, related...)
-	}
-
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &loanflagR{
 				Account: o,
 			}
 		} else {

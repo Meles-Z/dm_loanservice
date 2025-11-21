@@ -13,8 +13,10 @@ import (
 	"dm_loanservice/drivers/validator"
 	"dm_loanservice/internal/endpoint"
 	accountR "dm_loanservice/internal/service/repository/account"
+	duediligenceR "dm_loanservice/internal/service/repository/due_diligence"
 	lateFeeRuleR "dm_loanservice/internal/service/repository/late_fee_rule"
 	accountSvc "dm_loanservice/internal/service/usecase/account"
+	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
 	"fmt"
 
@@ -79,13 +81,15 @@ func main() {
 	// initialize repository
 	lateFeeRuleRepo := lateFeeRuleR.NewRepository(pgdb)
 	accountRepo := accountR.NewRepository(pgdb)
+	duediligenceRepo := duediligenceR.NewRepository(pgdb)
 	redisConn := redisLib.GetConnection(context.Background())
 	_ = redisConn
 
 	// initialize endpoints
 	e := endpoint.NewEndpoints(
 		lateFeeRuleSvc.NewService(lateFeeRuleRepo),
-		accountSvc.NewService(accountRepo),
+		accountSvc.NewService(accountRepo, duediligenceRepo),
+		duediligenceSvc.NewService(duediligenceRepo, accountRepo),
 	)
 
 	// define gothic provider

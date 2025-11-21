@@ -35,7 +35,7 @@ func (r *repository) AccountAdd(ctx context.Context, m dbmodels.Account) (*dbmod
 	}
 	return &m, nil
 }
-func (r *repository) AccountId(ctx context.Context, accountID string) (*dbmodels.Account, error) {
+func (r *repository) AccountRead(ctx context.Context, accountID string) (*dbmodels.Account, error) {
 	account, err := dbmodels.Accounts(qm.Where("id = ?", accountID)).One(ctx, r.db)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get account by ID: %w", err)

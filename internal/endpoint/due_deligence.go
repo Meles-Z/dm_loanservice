@@ -3,27 +3,27 @@ package endpoint
 import (
 	"context"
 	ctxDM "dm_loanservice/drivers/utils/context"
-	"dm_loanservice/internal/service/domain/account"
-	accountAvc "dm_loanservice/internal/service/usecase/account"
+	duediligence "dm_loanservice/internal/service/domain/due_diligence"
+	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
 	"errors"
 
 	"github.com/go-kit/kit/endpoint"
 )
 
-func makeAccountAddEndpoint(svc accountAvc.Service) endpoint.Endpoint {
+func makeDueDiligenceAddEndpoint(svc duediligenceSvc.Service) endpoint.Endpoint {
 	return func(ctx context.Context, req interface{}) (response interface{}, err error) {
 		data := ctx.Value(ctxDM.AppSession)
 		ctxSess := data.(*ctxDM.Context)
-		r, ok := req.(account.AccountAddRequest)
+		r, ok := req.(duediligence.DueDiligenceAddRequest)
 		if !ok {
-			err := errors.New("Error parse  Account Request")
+			err := errors.New("error parse  DueDiligence Request")
 			ctxSess.Lv4(err)
 			return nil, err
 		}
 		ctxSess.Request = r
 		ctxSess.Lv1("Incoming message")
 
-		respOK, respErr := svc.AccountAdd(ctx, ctxSess, r)
+		respOK, respErr := svc.DueDiligenceAdd(ctx, ctxSess, r)
 		if respErr != nil {
 			ctxSess.Lv4(respErr)
 			return respErr, nil
@@ -33,20 +33,20 @@ func makeAccountAddEndpoint(svc accountAvc.Service) endpoint.Endpoint {
 	}
 }
 
-func makeAccountReadEndpoint(svc accountAvc.Service) endpoint.Endpoint {
+func makeDueDiligenceReadEndpoint(svc duediligenceSvc.Service) endpoint.Endpoint {
 	return func(ctx context.Context, req interface{}) (response interface{}, err error) {
 		data := ctx.Value(ctxDM.AppSession)
 		ctxSess := data.(*ctxDM.Context)
-		r, ok := req.(account.AccountReadRequest)
+		r, ok := req.(duediligence.DueDiligenceReadRequest)
 		if !ok {
-			err := errors.New("Error parse  Account Request")
+			err := errors.New("error parse  DueDiligence Request")
 			ctxSess.Lv4(err)
 			return nil, err
 		}
 		ctxSess.Request = r
 		ctxSess.Lv1("Incoming message")
 
-		respOK, respErr := svc.AccountRead(ctx, ctxSess, r)
+		respOK, respErr := svc.DueDiligenceRead(ctx, ctxSess, r)
 		if respErr != nil {
 			ctxSess.Lv4(respErr)
 			return respErr, nil
@@ -56,20 +56,20 @@ func makeAccountReadEndpoint(svc accountAvc.Service) endpoint.Endpoint {
 	}
 }
 
-func makeAccountRecentArrearsEndpoint(svc accountAvc.Service) endpoint.Endpoint {
+func makeDueDiligenceUpdateEndpoint(svc duediligenceSvc.Service) endpoint.Endpoint {
 	return func(ctx context.Context, req interface{}) (response interface{}, err error) {
 		data := ctx.Value(ctxDM.AppSession)
 		ctxSess := data.(*ctxDM.Context)
-		// r, ok := req.(account.AccountRequest)
-		// if !ok {
-		// 	err := errors.New("Error parse  Account Request")
-		// 	ctxSess.Lv4(err)
-		// 	return nil, err
-		// }
-		// ctxSess.Request = r
+		r, ok := req.(duediligence.DueDiligenceUpdateRequest)
+		if !ok {
+			err := errors.New("error parse  DueDiligence Request")
+			ctxSess.Lv4(err)
+			return nil, err
+		}
+		ctxSess.Request = r
 		ctxSess.Lv1("Incoming message")
 
-		respOK, respErr := svc.AccountRecentArrears(ctx, ctxSess)
+		respOK, respErr := svc.DueDiligenceUpdate(ctx, ctxSess, r)
 		if respErr != nil {
 			ctxSess.Lv4(respErr)
 			return respErr, nil
@@ -79,13 +79,20 @@ func makeAccountRecentArrearsEndpoint(svc accountAvc.Service) endpoint.Endpoint 
 	}
 }
 
-func makeAccountMortgagePerformanceEndpoint(svc accountAvc.Service) endpoint.Endpoint {
+func makeDueDiligenceByAccountEndpoint(svc duediligenceSvc.Service) endpoint.Endpoint {
 	return func(ctx context.Context, req interface{}) (response interface{}, err error) {
 		data := ctx.Value(ctxDM.AppSession)
 		ctxSess := data.(*ctxDM.Context)
+		r, ok := req.(duediligence.DueDiligenceByAccountRequest)
+		if !ok {
+			err := errors.New("error parse  DueDiligence Request")
+			ctxSess.Lv4(err)
+			return nil, err
+		}
+		ctxSess.Request = r
 		ctxSess.Lv1("Incoming message")
 
-		respOK, respErr := svc.MortgagePerformance(ctx, ctxSess)
+		respOK, respErr := svc.DueDiligenceByAccount(ctx, ctxSess, r)
 		if respErr != nil {
 			ctxSess.Lv4(respErr)
 			return respErr, nil

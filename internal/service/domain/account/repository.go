@@ -8,7 +8,7 @@ import (
 
 type Repository interface {
 	AccountAdd(ctx context.Context, m dbmodels.Account) (*dbmodels.Account, error)
-	AccountId(ctx context.Context, accountID string) (*dbmodels.Account, error)
+	AccountRead(ctx context.Context, accountID string) (*dbmodels.Account, error)
 	AccountArrears(ctx context.Context) (*dashboard.TotalArrears, error)
 	RecentArrearsCases(ctx context.Context) ([]dashboard.ArrearsCase, error)
 	RecentArrears(ctx context.Context) ([]AccountRecentResponse, error)

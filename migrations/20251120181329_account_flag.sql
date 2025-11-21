@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 SELECT 'up SQL query';
-CREATE TABLE LoanFlags (
+CREATE TABLE account_flags (
     id VARCHAR(30) PRIMARY KEY,
     account_id VARCHAR(30) NOT NULL REFERENCES accounts(id),
     flag_type VARCHAR(100), -- e.g., 'ineligible', 'high-risk', 'fraud'

@@ -62,8 +62,8 @@ func (s *svc) AccountAdd(ctx context.Context, ctxdm *ctxDM.Context, req account.
 	return resp, nil
 }
 
-func (s *svc) AccountId(ctx context.Context, ctxDM *ctxDM.Context, req account.AccountReadRequest) (*account.AccountReadResponse, error) {
-	acc, err := s.r.AccountId(ctx, req.ID)
+func (s *svc) AccountRead(ctx context.Context, ctxDM *ctxDM.Context, req account.AccountReadRequest) (*account.AccountReadResponse, error) {
+	acc, err := s.r.AccountRead(ctx, req.ID)
 	if err != nil {
 		return nil, err
 	}
