@@ -2,6 +2,8 @@ package endpoint
 
 import (
 	accountSvc "dm_loanservice/internal/service/usecase/account"
+	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
+	accountflagSvc "dm_loanservice/internal/service/usecase/account_flag"
 	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
 
@@ -21,6 +23,13 @@ type Endpoints struct {
 	DueDiligenceRead      endpoint.Endpoint
 	DueDiligenceUpdate    endpoint.Endpoint
 	DueDiligenceByAccount endpoint.Endpoint
+
+	// account flag
+	AccountFlagAdd  endpoint.Endpoint
+	AccountFlagRead endpoint.Endpoint
+
+	// account audit log
+	AccountAuditLogRead endpoint.Endpoint
 
 	// product
 	ProductAdd                  endpoint.Endpoint
@@ -42,6 +51,8 @@ func NewEndpoints(
 	lateFeeRuleSvc lateFeeRuleSvc.Service,
 	accountSvc accountSvc.Service,
 	duediligenceSvc duediligenceSvc.Service,
+	accountflagSvc accountflagSvc.Service,
+	accountAuditLogSvc accountAuditLogSvc.Service,
 
 ) Endpoints {
 	return Endpoints{
@@ -57,6 +68,13 @@ func NewEndpoints(
 		DueDiligenceRead:      makeDueDiligenceReadEndpoint(duediligenceSvc),
 		DueDiligenceUpdate:    makeDueDiligenceUpdateEndpoint(duediligenceSvc),
 		DueDiligenceByAccount: makeDueDiligenceByAccountEndpoint(duediligenceSvc),
+
+		// account audit log
+		AccountAuditLogRead: makeAccountAuditLogReadEndpoint(accountAuditLogSvc),
+
+		// account flag
+		AccountFlagAdd:  makeAccountFlagAddEndpoint(accountflagSvc),
+		AccountFlagRead: makeAccountFlagReadEndpoint(accountflagSvc),
 
 		LateFeeRuleAdd:    makeLateFeeRuleAddEndpoint(lateFeeRuleSvc),
 		LateFeeRuleRead:   makeLateFeeRuleReadEndpoint(lateFeeRuleSvc),

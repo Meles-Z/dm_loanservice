@@ -44,3 +44,11 @@ func calculateOverallStatus(items []*dbmodels.Duediligencechecklistitem) string 
 	}
 	return "Pending"
 }
+
+func mapDueDiligenceList(items []*dbmodels.Duediligencechecklistitem) []duediligence.DueDiligence {
+    mapped := make([]duediligence.DueDiligence, 0, len(items))
+    for _, i := range items {
+        mapped = append(mapped, mapDueDiligence(i))
+    }
+    return mapped
+}

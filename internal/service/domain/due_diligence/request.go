@@ -27,14 +27,14 @@ type (
 )
 
 func (r *DueDiligenceAddRequest) Validate() error {
-	return validator.Validate.Struct(&r)
+	return validator.Validate.Struct(r)
 }
 func (r *DueDiligenceReadRequest) Validate() error {
-	return validator.Validate.Struct(&r)
+	return validator.Validate.Struct(r)
 }
 func (r *DueDiligenceUpdateRequest) Validate() error {
-	return validator.Validate.Struct(&r)
+	return validator.Validate.Struct(r)
 }
 func (r *DueDiligenceByAccountRequest) Validate() error {
-	return validator.Validate.Struct(&r)
+	return validator.Validate.Struct(r)
 }

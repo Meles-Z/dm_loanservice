@@ -13,9 +13,13 @@ import (
 	"dm_loanservice/drivers/validator"
 	"dm_loanservice/internal/endpoint"
 	accountR "dm_loanservice/internal/service/repository/account"
+	accountAuditLogR "dm_loanservice/internal/service/repository/account_audit_log"
+	accountflagR "dm_loanservice/internal/service/repository/account_flag"
 	duediligenceR "dm_loanservice/internal/service/repository/due_diligence"
 	lateFeeRuleR "dm_loanservice/internal/service/repository/late_fee_rule"
 	accountSvc "dm_loanservice/internal/service/usecase/account"
+	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
+	accountflagSvc "dm_loanservice/internal/service/usecase/account_flag"
 	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
 	"fmt"
@@ -82,6 +86,8 @@ func main() {
 	lateFeeRuleRepo := lateFeeRuleR.NewRepository(pgdb)
 	accountRepo := accountR.NewRepository(pgdb)
 	duediligenceRepo := duediligenceR.NewRepository(pgdb)
+	accountFlagRepo := accountflagR.NewRepository(pgdb)
+	accountAuditLogRepo := accountAuditLogR.NewRepository(pgdb)
 	redisConn := redisLib.GetConnection(context.Background())
 	_ = redisConn
 
@@ -89,7 +95,9 @@ func main() {
 	e := endpoint.NewEndpoints(
 		lateFeeRuleSvc.NewService(lateFeeRuleRepo),
 		accountSvc.NewService(accountRepo, duediligenceRepo),
-		duediligenceSvc.NewService(duediligenceRepo, accountRepo),
+		duediligenceSvc.NewService(duediligenceRepo, accountRepo, accountFlagRepo),
+		accountflagSvc.NewService(accountFlagRepo, accountRepo),
+		accountAuditLogSvc.NewService(accountAuditLogRepo, accountRepo),
 	)
 
 	// define gothic provider

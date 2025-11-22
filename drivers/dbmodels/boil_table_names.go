@@ -4,6 +4,7 @@
 package dbmodels
 
 var TableNames = struct {
+	AccountAuditLog            string
 	AccountFlags               string
 	Accounts                   string
 	Aircraft                   string
@@ -37,7 +38,6 @@ var TableNames = struct {
 	LateFeeCalculations        string
 	LateFeeRules               string
 	Leg                        string
-	Loanauditlog               string
 	Operation                  string
 	OverpaymentRules           string
 	Overpayments               string
@@ -72,6 +72,7 @@ var TableNames = struct {
 	WebQuery                   string
 	WebQueryNotes              string
 }{
+	AccountAuditLog:            "account_audit_log",
 	AccountFlags:               "account_flags",
 	Accounts:                   "accounts",
 	Aircraft:                   "aircraft",
@@ -105,7 +106,6 @@ var TableNames = struct {
 	LateFeeCalculations:        "late_fee_calculations",
 	LateFeeRules:               "late_fee_rules",
 	Leg:                        "leg",
-	Loanauditlog:               "loanauditlog",
 	Operation:                  "operation",
 	OverpaymentRules:           "overpayment_rules",
 	Overpayments:               "overpayments",

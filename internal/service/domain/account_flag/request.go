@@ -15,8 +15,9 @@ type (
 )
 
 func (r *AccountFlagAddRequest) Validate() error {
-	return validator.Validate.Struct(&r)
+	return validator.Validate.Struct(r) 
 }
+
 func (r *AccountFlagReadRequest) Validate() error {
-	return validator.Validate.Struct(&r)
+	return validator.Validate.Struct(r) 
 }

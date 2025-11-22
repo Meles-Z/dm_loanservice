@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 	"dm_loanservice/drivers/dbmodels"
+	"dm_loanservice/drivers/utils"
 	ctxDM "dm_loanservice/drivers/utils/context"
 	"dm_loanservice/drivers/uuid"
 	"dm_loanservice/internal/service/domain/account"
@@ -63,6 +64,9 @@ func (s *svc) AccountAdd(ctx context.Context, ctxdm *ctxDM.Context, req account.
 }
 
 func (s *svc) AccountRead(ctx context.Context, ctxDM *ctxDM.Context, req account.AccountReadRequest) (*account.AccountReadResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, utils.ErrBadRequest
+	}
 	acc, err := s.r.AccountRead(ctx, req.ID)
 	if err != nil {
 		return nil, err

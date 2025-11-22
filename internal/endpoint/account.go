@@ -16,7 +16,7 @@ func makeAccountAddEndpoint(svc accountAvc.Service) endpoint.Endpoint {
 		ctxSess := data.(*ctxDM.Context)
 		r, ok := req.(account.AccountAddRequest)
 		if !ok {
-			err := errors.New("Error parse  Account Request")
+			err := errors.New("error parse  Account Request")
 			ctxSess.Lv4(err)
 			return nil, err
 		}
@@ -39,7 +39,7 @@ func makeAccountReadEndpoint(svc accountAvc.Service) endpoint.Endpoint {
 		ctxSess := data.(*ctxDM.Context)
 		r, ok := req.(account.AccountReadRequest)
 		if !ok {
-			err := errors.New("Error parse  Account Request")
+			err := errors.New("error parse  Account Request")
 			ctxSess.Lv4(err)
 			return nil, err
 		}

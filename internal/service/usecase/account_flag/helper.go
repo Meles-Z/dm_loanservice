@@ -9,9 +9,9 @@ func mapAccountFlag(flag *dbmodels.AccountFlag) accountflag.AccountFlag {
 	return accountflag.AccountFlag{
 		ID:        flag.ID,
 		AccountID: flag.AccountID,
-		FlagType:  flag.FlagType.String,
+		FlagType:  flag.FlagType,
 		Reason:    flag.Reason.String,
-		FlaggedBy: flag.FlaggedBy.Int,
+		FlaggedBy: flag.FlaggedBy,
 		FlaggedAt: flag.FlaggedAt.Time,
 	}
 }
