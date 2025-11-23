@@ -31,6 +31,22 @@ func decodeAccountReadRequest(_ context.Context, r *http.Request) (interface{}, 
 	return req, nil
 }
 
+func decodeAccountUpdateRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var (
+		err error
+		req domain.AccountUpdateRequest
+	)
+
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, errors.WithMessage(err, "error decode request")
+	}
+
+	vars := mux.Vars(r)
+	req.ID = vars["id"]
+	return req, nil
+}
+
 func decodeAccountRecentArrearsRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	// var (
 	// 	err error

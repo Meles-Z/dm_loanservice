@@ -77,3 +77,73 @@ func (r *repository) DueDiligenceByAccount(ctx context.Context, accountID string
 	}
 	return dd, nil
 }
+
+func (r *repository) DueDiligenceStatusSummary(ctx context.Context) (pass, pending, fail int64, err error) {
+	query := `
+        SELECT
+            CASE
+                WHEN SUM(CASE WHEN status = 'fail' THEN 1 END) > 0 THEN 'fail'
+                WHEN SUM(CASE WHEN status = 'pending' THEN 1 END) > 0 THEN 'pending'
+                ELSE 'pass'
+            END AS final_status
+        FROM due_diligence_checklist_items
+        GROUP BY account_id;
+    `
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	var status string
+	for rows.Next() {
+		if err = rows.Scan(&status); err != nil {
+			return
+		}
+		switch status {
+		case "pass":
+			pass++
+		case "fail":
+			fail++
+		case "pending":
+			pending++
+		}
+	}
+
+	return
+}
+
+
+
+func (r *repository) GetDDStatusMap(ctx context.Context) (map[string]string, error) {
+	query := `
+        SELECT account_id,
+            CASE
+                WHEN SUM(CASE WHEN status = 'fail' THEN 1 END) > 0 THEN 'fail'
+                WHEN SUM(CASE WHEN status = 'pending' THEN 1 END) > 0 THEN 'pending'
+                ELSE 'pass'
+            END AS final_status
+        FROM due_diligence_checklist_items
+        GROUP BY account_id;
+    `
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[string]string)
+
+	var accountID, status string
+
+	for rows.Next() {
+		if err := rows.Scan(&accountID, &status); err != nil {
+			return nil, err
+		}
+		result[accountID] = status
+	}
+
+	return result, nil
+}

@@ -15,13 +15,22 @@ import (
 	accountR "dm_loanservice/internal/service/repository/account"
 	accountAuditLogR "dm_loanservice/internal/service/repository/account_audit_log"
 	accountflagR "dm_loanservice/internal/service/repository/account_flag"
+	accountLockRuleR "dm_loanservice/internal/service/repository/account_lock_rule"
+	collateralR "dm_loanservice/internal/service/repository/collateral"
 	duediligenceR "dm_loanservice/internal/service/repository/due_diligence"
+	investorRestrictionR "dm_loanservice/internal/service/repository/investor_restriction"
 	lateFeeRuleR "dm_loanservice/internal/service/repository/late_fee_rule"
+	serviceRestrictionR "dm_loanservice/internal/service/repository/service_restriction"
 	accountSvc "dm_loanservice/internal/service/usecase/account"
 	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
 	accountflagSvc "dm_loanservice/internal/service/usecase/account_flag"
+	accountLockRuleSvc "dm_loanservice/internal/service/usecase/account_lock_rule"
 	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
+	investorRestrictionSvc "dm_loanservice/internal/service/usecase/investor_restriction"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
+	securitisationSvc "dm_loanservice/internal/service/usecase/securitisation"
+	serviceRestrictionSvc "dm_loanservice/internal/service/usecase/service_restriction"
+
 	"fmt"
 
 	_ "github.com/lib/pq"
@@ -88,16 +97,24 @@ func main() {
 	duediligenceRepo := duediligenceR.NewRepository(pgdb)
 	accountFlagRepo := accountflagR.NewRepository(pgdb)
 	accountAuditLogRepo := accountAuditLogR.NewRepository(pgdb)
+	serviceRestrictionRepo := serviceRestrictionR.NewRepository(pgdb)
+	investorRestrictionRepo := investorRestrictionR.NewRepository(pgdb)
+	accountLockRuleRepo := accountLockRuleR.NewRepository(pgdb)
+	collateralRepo := collateralR.NewRepository(pgdb)
 	redisConn := redisLib.GetConnection(context.Background())
 	_ = redisConn
 
 	// initialize endpoints
 	e := endpoint.NewEndpoints(
 		lateFeeRuleSvc.NewService(lateFeeRuleRepo),
-		accountSvc.NewService(accountRepo, duediligenceRepo),
-		duediligenceSvc.NewService(duediligenceRepo, accountRepo, accountFlagRepo),
-		accountflagSvc.NewService(accountFlagRepo, accountRepo),
+		accountSvc.NewService(accountRepo, duediligenceRepo, accountLockRuleRepo, serviceRestrictionRepo),
+		duediligenceSvc.NewService(duediligenceRepo, accountRepo, accountFlagRepo, accountAuditLogRepo),
+		accountflagSvc.NewService(accountFlagRepo, accountRepo, accountAuditLogRepo),
 		accountAuditLogSvc.NewService(accountAuditLogRepo, accountRepo),
+		accountLockRuleSvc.NewService(accountLockRuleRepo, accountRepo),
+		serviceRestrictionSvc.NewService(serviceRestrictionRepo, accountRepo, investorRestrictionRepo, accountLockRuleRepo),
+		investorRestrictionSvc.NewService(investorRestrictionRepo, accountRepo),
+		securitisationSvc.NewService(accountRepo, nil, duediligenceRepo, accountFlagRepo, collateralRepo),
 	)
 
 	// define gothic provider

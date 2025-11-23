@@ -6,6 +6,7 @@ package dbmodels
 var TableNames = struct {
 	AccountAuditLog            string
 	AccountFlags               string
+	AccountLockRules           string
 	Accounts                   string
 	Aircraft                   string
 	AircraftFacilities         string
@@ -16,6 +17,7 @@ var TableNames = struct {
 	CategoryField              string
 	Certification              string
 	City                       string
+	Collaterals                string
 	Country                    string
 	Currency                   string
 	CustomerInquiries          string
@@ -32,6 +34,7 @@ var TableNames = struct {
 	Flights                    string
 	FlightsGroup               string
 	FlightsOld                 string
+	InvestorRestrictions       string
 	Journey                    string
 	Kyc                        string
 	Languages                  string
@@ -47,6 +50,7 @@ var TableNames = struct {
 	Permissions                string
 	Photo                      string
 	Products                   string
+	Property                   string
 	Prospects                  string
 	Quote                      string
 	QuoteChat                  string
@@ -58,6 +62,8 @@ var TableNames = struct {
 	RepaymentPlans             string
 	Roles                      string
 	SearchHistory              string
+	SecuritisationPools        string
+	ServicingRestrictions      string
 	Tasks                      string
 	Team                       string
 	TeamLogo                   string
@@ -74,6 +80,7 @@ var TableNames = struct {
 }{
 	AccountAuditLog:            "account_audit_log",
 	AccountFlags:               "account_flags",
+	AccountLockRules:           "account_lock_rules",
 	Accounts:                   "accounts",
 	Aircraft:                   "aircraft",
 	AircraftFacilities:         "aircraft_facilities",
@@ -84,6 +91,7 @@ var TableNames = struct {
 	CategoryField:              "category_field",
 	Certification:              "certification",
 	City:                       "city",
+	Collaterals:                "collaterals",
 	Country:                    "country",
 	Currency:                   "currency",
 	CustomerInquiries:          "customer_inquiries",
@@ -100,6 +108,7 @@ var TableNames = struct {
 	Flights:                    "flights",
 	FlightsGroup:               "flights_group",
 	FlightsOld:                 "flights_old",
+	InvestorRestrictions:       "investor_restrictions",
 	Journey:                    "journey",
 	Kyc:                        "kyc",
 	Languages:                  "languages",
@@ -115,6 +124,7 @@ var TableNames = struct {
 	Permissions:                "permissions",
 	Photo:                      "photo",
 	Products:                   "products",
+	Property:                   "property",
 	Prospects:                  "prospects",
 	Quote:                      "quote",
 	QuoteChat:                  "quote_chat",
@@ -126,6 +136,8 @@ var TableNames = struct {
 	RepaymentPlans:             "repayment_plans",
 	Roles:                      "roles",
 	SearchHistory:              "search_history",
+	SecuritisationPools:        "securitisation_pools",
+	ServicingRestrictions:      "servicing_restrictions",
 	Tasks:                      "tasks",
 	Team:                       "team",
 	TeamLogo:                   "team_logo",

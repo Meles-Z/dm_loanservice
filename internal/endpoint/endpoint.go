@@ -4,8 +4,12 @@ import (
 	accountSvc "dm_loanservice/internal/service/usecase/account"
 	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
 	accountflagSvc "dm_loanservice/internal/service/usecase/account_flag"
+	accountLockRuleSvc "dm_loanservice/internal/service/usecase/account_lock_rule"
 	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
+	investorRestrictionSvc "dm_loanservice/internal/service/usecase/investor_restriction"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
+	securitisationSvc "dm_loanservice/internal/service/usecase/securitisation"
+	serviceRestrictionSvc "dm_loanservice/internal/service/usecase/service_restriction"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -15,6 +19,7 @@ type Endpoints struct {
 	// account
 	AccountAdd          endpoint.Endpoint
 	AccountRead         endpoint.Endpoint
+	AccountUpdate       endpoint.Endpoint
 	RecentArrears       endpoint.Endpoint
 	MortgagePerformance endpoint.Endpoint
 
@@ -30,6 +35,23 @@ type Endpoints struct {
 
 	// account audit log
 	AccountAuditLogRead endpoint.Endpoint
+
+	// account lock rule
+	AccountLockRuleAdd  endpoint.Endpoint
+	AccountLockRuleRead endpoint.Endpoint
+
+	// service restriction
+	ServiceRestrictionAdd           endpoint.Endpoint
+	ServiceRestrictionRead          endpoint.Endpoint
+	ServiceRestrictionReadByAccount endpoint.Endpoint
+
+	// investor restriction
+	InvestorRestrictionAdd  endpoint.Endpoint
+	InvestorRestrictionRead endpoint.Endpoint
+	// securitisation
+	EligibleAccount              endpoint.Endpoint
+	EligibleAccountSummary       endpoint.Endpoint
+	EligibleAccountSummaryReport endpoint.Endpoint
 
 	// product
 	ProductAdd                  endpoint.Endpoint
@@ -53,6 +75,10 @@ func NewEndpoints(
 	duediligenceSvc duediligenceSvc.Service,
 	accountflagSvc accountflagSvc.Service,
 	accountAuditLogSvc accountAuditLogSvc.Service,
+	accountLockRuleSvc accountLockRuleSvc.Service,
+	serviceRestrictionSvc serviceRestrictionSvc.Service,
+	investorRestrictionSvc investorRestrictionSvc.Service,
+	securitisationSvc securitisationSvc.Service,
 
 ) Endpoints {
 	return Endpoints{
@@ -60,6 +86,7 @@ func NewEndpoints(
 		// Account
 		AccountAdd:          makeAccountAddEndpoint(accountSvc),
 		AccountRead:         makeAccountReadEndpoint(accountSvc),
+		AccountUpdate:       makeAccountUpdateEndpoint(accountSvc),
 		RecentArrears:       makeAccountRecentArrearsEndpoint(accountSvc),
 		MortgagePerformance: makeAccountMortgagePerformanceEndpoint(accountSvc),
 
@@ -75,6 +102,23 @@ func NewEndpoints(
 		// account flag
 		AccountFlagAdd:  makeAccountFlagAddEndpoint(accountflagSvc),
 		AccountFlagRead: makeAccountFlagReadEndpoint(accountflagSvc),
+
+		// account lock rule
+		AccountLockRuleAdd:  makeAccountLockRuleAddEndpoint(accountLockRuleSvc),
+		AccountLockRuleRead: makeAccountLockRuleReadEndpoint(accountLockRuleSvc),
+
+		// service restriction
+		ServiceRestrictionAdd:           makeServiceRestrictionAddEndpoint(serviceRestrictionSvc),
+		ServiceRestrictionRead:          makeServiceRestrictionReadEndpoint(serviceRestrictionSvc),
+		ServiceRestrictionReadByAccount: makeServiceRestrictionReadByAccountEndpoint(serviceRestrictionSvc),
+
+		// investor restriction
+		InvestorRestrictionAdd:  makeInvestorRestrictionAddEndpoint(investorRestrictionSvc),
+		InvestorRestrictionRead: makeInvestorRestrictionReadEndpoint(investorRestrictionSvc),
+		// securitisation
+		EligibleAccount:              makeAccountEligibleEndpoint(securitisationSvc),
+		EligibleAccountSummary:       MakeEligibleAccountSummaryHandler(securitisationSvc),
+		EligibleAccountSummaryReport: MakeEligibleAccountSummaryReportHandler(securitisationSvc),
 
 		LateFeeRuleAdd:    makeLateFeeRuleAddEndpoint(lateFeeRuleSvc),
 		LateFeeRuleRead:   makeLateFeeRuleReadEndpoint(lateFeeRuleSvc),

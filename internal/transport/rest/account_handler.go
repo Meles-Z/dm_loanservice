@@ -13,6 +13,11 @@ func MakeAccountReadHandler(e endpoint.Endpoint) *httptransport.Server {
 	return httptransport.NewServer(e, decodeAccountReadRequest, encodeDefaultResponse, opts...)
 }
 
+func MakeAccountUpdateHandler(e endpoint.Endpoint) *httptransport.Server {
+	return httptransport.NewServer(e, decodeAccountUpdateRequest, encodeDefaultResponse, opts...)
+}
+
+
 func MakeAccountRecentArrearsHandler(e endpoint.Endpoint) *httptransport.Server {
 	return httptransport.NewServer(e, decodeAccountRecentArrearsRequest, encodeDefaultResponse, opts...)
 }

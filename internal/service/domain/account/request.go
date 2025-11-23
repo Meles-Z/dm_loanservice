@@ -96,6 +96,37 @@ type AccountReadRequest struct {
 	ID string `json:"account" validate:"required"`
 }
 
+type AccountUpdateRequest struct {
+	ID                 string         `json:"id" validate:"required"`
+	MortgageID         *string        `json:"mortgage_id,omitempty"`
+	CustomerID         *string        `json:"customer_id,omitempty"`
+	ProductID          *string        `json:"product_id,omitempty"`
+	LoanAmount         *types.Decimal `json:"loan_amount,omitempty"`
+	BalanceOutstanding *types.Decimal `json:"balance_outstanding,omitempty"`
+	StartDate          *time.Time     `json:"start_date,omitempty"`
+	EndDate            *time.Time     `json:"end_date,omitempty"`
+	TermYears          *int           `json:"term_years,omitempty"`
+
+	ArrearsFlag   *bool          `json:"arrears_flag,omitempty"`
+	ArrearsAmount *types.Decimal `json:"arrears_amount,omitempty"`
+	ArrearsDays   *int           `json:"arrears_days,omitempty"`
+
+	ForbearanceFlag *bool   `json:"forbearance_flag,omitempty"`
+	ForbearanceType *string `json:"forbearance_type,omitempty"`
+
+	FraudFlag  *bool   `json:"fraud_flag,omitempty"`
+	FraudNotes *string `json:"fraud_notes,omitempty"`
+
+	RedrawFacility    *bool   `json:"redraw_facility,omitempty"`
+	CollateralAddress *string `json:"collateral_address,omitempty"`
+	CollateralType    *string `json:"collateral_type,omitempty"`
+	SecurityType      *string `json:"security_type,omitempty"`
+
+	PortfolioID         *string `json:"portfolio_id,omitempty"`
+	StressTestResult    *string `json:"stress_test_result,omitempty"`
+	CapitalAdequacyFlag *bool   `json:"capital_adequacy_flag,omitempty"`
+}
+
 func (t *AccountReadRequest) Validate() error {
 	return nil
 }

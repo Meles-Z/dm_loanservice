@@ -201,27 +201,6 @@ func (w whereHelpertypes_Decimal) GTE(x types.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-type whereHelpertime_Time struct{ field string }
-
-func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.EQ, x)
-}
-func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
 type whereHelpernull_Bool struct{ field string }
 
 func (w whereHelpernull_Bool) EQ(x null.Bool) qm.QueryMod {
@@ -338,21 +317,29 @@ var AccountRels = struct {
 	Product                    string
 	AccountAuditLogs           string
 	AccountFlags               string
+	AccountLockRules           string
+	Collaterals                string
 	Duediligencechecklistitems string
+	InvestorRestrictions       string
 	LateFeeCalculations        string
 	Overpayments               string
 	PaymentAdjustments         string
 	Payments                   string
+	ServicingRestrictions      string
 }{
 	Customer:                   "Customer",
 	Product:                    "Product",
 	AccountAuditLogs:           "AccountAuditLogs",
 	AccountFlags:               "AccountFlags",
+	AccountLockRules:           "AccountLockRules",
+	Collaterals:                "Collaterals",
 	Duediligencechecklistitems: "Duediligencechecklistitems",
+	InvestorRestrictions:       "InvestorRestrictions",
 	LateFeeCalculations:        "LateFeeCalculations",
 	Overpayments:               "Overpayments",
 	PaymentAdjustments:         "PaymentAdjustments",
 	Payments:                   "Payments",
+	ServicingRestrictions:      "ServicingRestrictions",
 }
 
 // accountR is where relationships are stored.
@@ -361,11 +348,15 @@ type accountR struct {
 	Product                    *Product                       `boil:"Product" json:"Product" toml:"Product" yaml:"Product"`
 	AccountAuditLogs           AccountAuditLogSlice           `boil:"AccountAuditLogs" json:"AccountAuditLogs" toml:"AccountAuditLogs" yaml:"AccountAuditLogs"`
 	AccountFlags               AccountFlagSlice               `boil:"AccountFlags" json:"AccountFlags" toml:"AccountFlags" yaml:"AccountFlags"`
+	AccountLockRules           AccountLockRuleSlice           `boil:"AccountLockRules" json:"AccountLockRules" toml:"AccountLockRules" yaml:"AccountLockRules"`
+	Collaterals                CollateralSlice                `boil:"Collaterals" json:"Collaterals" toml:"Collaterals" yaml:"Collaterals"`
 	Duediligencechecklistitems DuediligencechecklistitemSlice `boil:"Duediligencechecklistitems" json:"Duediligencechecklistitems" toml:"Duediligencechecklistitems" yaml:"Duediligencechecklistitems"`
+	InvestorRestrictions       InvestorRestrictionSlice       `boil:"InvestorRestrictions" json:"InvestorRestrictions" toml:"InvestorRestrictions" yaml:"InvestorRestrictions"`
 	LateFeeCalculations        LateFeeCalculationSlice        `boil:"LateFeeCalculations" json:"LateFeeCalculations" toml:"LateFeeCalculations" yaml:"LateFeeCalculations"`
 	Overpayments               OverpaymentSlice               `boil:"Overpayments" json:"Overpayments" toml:"Overpayments" yaml:"Overpayments"`
 	PaymentAdjustments         PaymentAdjustmentSlice         `boil:"PaymentAdjustments" json:"PaymentAdjustments" toml:"PaymentAdjustments" yaml:"PaymentAdjustments"`
 	Payments                   PaymentSlice                   `boil:"Payments" json:"Payments" toml:"Payments" yaml:"Payments"`
+	ServicingRestrictions      ServicingRestrictionSlice      `boil:"ServicingRestrictions" json:"ServicingRestrictions" toml:"ServicingRestrictions" yaml:"ServicingRestrictions"`
 }
 
 // NewStruct creates a new relationship struct
@@ -437,6 +428,38 @@ func (r *accountR) GetAccountFlags() AccountFlagSlice {
 	return r.AccountFlags
 }
 
+func (o *Account) GetAccountLockRules() AccountLockRuleSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetAccountLockRules()
+}
+
+func (r *accountR) GetAccountLockRules() AccountLockRuleSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.AccountLockRules
+}
+
+func (o *Account) GetCollaterals() CollateralSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetCollaterals()
+}
+
+func (r *accountR) GetCollaterals() CollateralSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.Collaterals
+}
+
 func (o *Account) GetDuediligencechecklistitems() DuediligencechecklistitemSlice {
 	if o == nil {
 		return nil
@@ -451,6 +474,22 @@ func (r *accountR) GetDuediligencechecklistitems() DuediligencechecklistitemSlic
 	}
 
 	return r.Duediligencechecklistitems
+}
+
+func (o *Account) GetInvestorRestrictions() InvestorRestrictionSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetInvestorRestrictions()
+}
+
+func (r *accountR) GetInvestorRestrictions() InvestorRestrictionSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.InvestorRestrictions
 }
 
 func (o *Account) GetLateFeeCalculations() LateFeeCalculationSlice {
@@ -515,6 +554,22 @@ func (r *accountR) GetPayments() PaymentSlice {
 	}
 
 	return r.Payments
+}
+
+func (o *Account) GetServicingRestrictions() ServicingRestrictionSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetServicingRestrictions()
+}
+
+func (r *accountR) GetServicingRestrictions() ServicingRestrictionSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.ServicingRestrictions
 }
 
 // accountL is where Load methods for each relationship are stored.
@@ -883,6 +938,34 @@ func (o *Account) AccountFlags(mods ...qm.QueryMod) accountFlagQuery {
 	return AccountFlags(queryMods...)
 }
 
+// AccountLockRules retrieves all the account_lock_rule's AccountLockRules with an executor.
+func (o *Account) AccountLockRules(mods ...qm.QueryMod) accountLockRuleQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"account_lock_rules\".\"account_id\"=?", o.ID),
+	)
+
+	return AccountLockRules(queryMods...)
+}
+
+// Collaterals retrieves all the collateral's Collaterals with an executor.
+func (o *Account) Collaterals(mods ...qm.QueryMod) collateralQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"collaterals\".\"account_id\"=?", o.ID),
+	)
+
+	return Collaterals(queryMods...)
+}
+
 // Duediligencechecklistitems retrieves all the duediligencechecklistitem's Duediligencechecklistitems with an executor.
 func (o *Account) Duediligencechecklistitems(mods ...qm.QueryMod) duediligencechecklistitemQuery {
 	var queryMods []qm.QueryMod
@@ -895,6 +978,20 @@ func (o *Account) Duediligencechecklistitems(mods ...qm.QueryMod) duediligencech
 	)
 
 	return Duediligencechecklistitems(queryMods...)
+}
+
+// InvestorRestrictions retrieves all the investor_restriction's InvestorRestrictions with an executor.
+func (o *Account) InvestorRestrictions(mods ...qm.QueryMod) investorRestrictionQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"investor_restrictions\".\"account_id\"=?", o.ID),
+	)
+
+	return InvestorRestrictions(queryMods...)
 }
 
 // LateFeeCalculations retrieves all the late_fee_calculation's LateFeeCalculations with an executor.
@@ -951,6 +1048,20 @@ func (o *Account) Payments(mods ...qm.QueryMod) paymentQuery {
 	)
 
 	return Payments(queryMods...)
+}
+
+// ServicingRestrictions retrieves all the servicing_restriction's ServicingRestrictions with an executor.
+func (o *Account) ServicingRestrictions(mods ...qm.QueryMod) servicingRestrictionQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"servicing_restrictions\".\"account_id\"=?", o.ID),
+	)
+
+	return ServicingRestrictions(queryMods...)
 }
 
 // LoadCustomer allows an eager lookup of values, cached into the
@@ -1419,6 +1530,232 @@ func (accountL) LoadAccountFlags(ctx context.Context, e boil.ContextExecutor, si
 	return nil
 }
 
+// LoadAccountLockRules allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (accountL) LoadAccountLockRules(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
+	var slice []*Account
+	var object *Account
+
+	if singular {
+		var ok bool
+		object, ok = maybeAccount.(*Account)
+		if !ok {
+			object = new(Account)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
+			}
+		}
+	} else {
+		s, ok := maybeAccount.(*[]*Account)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &accountR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &accountR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`account_lock_rules`),
+		qm.WhereIn(`account_lock_rules.account_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load account_lock_rules")
+	}
+
+	var resultSlice []*AccountLockRule
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice account_lock_rules")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on account_lock_rules")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for account_lock_rules")
+	}
+
+	if len(accountLockRuleAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.AccountLockRules = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &accountLockRuleR{}
+			}
+			foreign.R.Account = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.AccountID {
+				local.R.AccountLockRules = append(local.R.AccountLockRules, foreign)
+				if foreign.R == nil {
+					foreign.R = &accountLockRuleR{}
+				}
+				foreign.R.Account = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadCollaterals allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (accountL) LoadCollaterals(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
+	var slice []*Account
+	var object *Account
+
+	if singular {
+		var ok bool
+		object, ok = maybeAccount.(*Account)
+		if !ok {
+			object = new(Account)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
+			}
+		}
+	} else {
+		s, ok := maybeAccount.(*[]*Account)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &accountR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &accountR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`collaterals`),
+		qm.WhereIn(`collaterals.account_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load collaterals")
+	}
+
+	var resultSlice []*Collateral
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice collaterals")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on collaterals")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for collaterals")
+	}
+
+	if len(collateralAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Collaterals = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &collateralR{}
+			}
+			foreign.R.Account = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.AccountID {
+				local.R.Collaterals = append(local.R.Collaterals, foreign)
+				if foreign.R == nil {
+					foreign.R = &collateralR{}
+				}
+				foreign.R.Account = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // LoadDuediligencechecklistitems allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (accountL) LoadDuediligencechecklistitems(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
@@ -1522,6 +1859,119 @@ func (accountL) LoadDuediligencechecklistitems(ctx context.Context, e boil.Conte
 				local.R.Duediligencechecklistitems = append(local.R.Duediligencechecklistitems, foreign)
 				if foreign.R == nil {
 					foreign.R = &duediligencechecklistitemR{}
+				}
+				foreign.R.Account = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadInvestorRestrictions allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (accountL) LoadInvestorRestrictions(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
+	var slice []*Account
+	var object *Account
+
+	if singular {
+		var ok bool
+		object, ok = maybeAccount.(*Account)
+		if !ok {
+			object = new(Account)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
+			}
+		}
+	} else {
+		s, ok := maybeAccount.(*[]*Account)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &accountR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &accountR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`investor_restrictions`),
+		qm.WhereIn(`investor_restrictions.account_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load investor_restrictions")
+	}
+
+	var resultSlice []*InvestorRestriction
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice investor_restrictions")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on investor_restrictions")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for investor_restrictions")
+	}
+
+	if len(investorRestrictionAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.InvestorRestrictions = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &investorRestrictionR{}
+			}
+			foreign.R.Account = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.AccountID {
+				local.R.InvestorRestrictions = append(local.R.InvestorRestrictions, foreign)
+				if foreign.R == nil {
+					foreign.R = &investorRestrictionR{}
 				}
 				foreign.R.Account = local
 				break
@@ -1984,6 +2434,119 @@ func (accountL) LoadPayments(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
+// LoadServicingRestrictions allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (accountL) LoadServicingRestrictions(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAccount interface{}, mods queries.Applicator) error {
+	var slice []*Account
+	var object *Account
+
+	if singular {
+		var ok bool
+		object, ok = maybeAccount.(*Account)
+		if !ok {
+			object = new(Account)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAccount))
+			}
+		}
+	} else {
+		s, ok := maybeAccount.(*[]*Account)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAccount)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAccount))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &accountR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &accountR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`servicing_restrictions`),
+		qm.WhereIn(`servicing_restrictions.account_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load servicing_restrictions")
+	}
+
+	var resultSlice []*ServicingRestriction
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice servicing_restrictions")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on servicing_restrictions")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for servicing_restrictions")
+	}
+
+	if len(servicingRestrictionAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.ServicingRestrictions = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &servicingRestrictionR{}
+			}
+			foreign.R.Account = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.AccountID) {
+				local.R.ServicingRestrictions = append(local.R.ServicingRestrictions, foreign)
+				if foreign.R == nil {
+					foreign.R = &servicingRestrictionR{}
+				}
+				foreign.R.Account = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetCustomer of the account to the related item.
 // Sets o.R.Customer to related.
 // Adds o to related.R.Accounts.
@@ -2184,6 +2747,112 @@ func (o *Account) AddAccountFlags(ctx context.Context, exec boil.ContextExecutor
 	return nil
 }
 
+// AddAccountLockRules adds the given related objects to the existing relationships
+// of the account, optionally inserting them as new records.
+// Appends related to o.R.AccountLockRules.
+// Sets related.R.Account appropriately.
+func (o *Account) AddAccountLockRules(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AccountLockRule) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.AccountID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"account_lock_rules\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
+				strmangle.WhereClause("\"", "\"", 2, accountLockRulePrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.AccountID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &accountR{
+			AccountLockRules: related,
+		}
+	} else {
+		o.R.AccountLockRules = append(o.R.AccountLockRules, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &accountLockRuleR{
+				Account: o,
+			}
+		} else {
+			rel.R.Account = o
+		}
+	}
+	return nil
+}
+
+// AddCollaterals adds the given related objects to the existing relationships
+// of the account, optionally inserting them as new records.
+// Appends related to o.R.Collaterals.
+// Sets related.R.Account appropriately.
+func (o *Account) AddCollaterals(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Collateral) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.AccountID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"collaterals\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
+				strmangle.WhereClause("\"", "\"", 2, collateralPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.AccountID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &accountR{
+			Collaterals: related,
+		}
+	} else {
+		o.R.Collaterals = append(o.R.Collaterals, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &collateralR{
+				Account: o,
+			}
+		} else {
+			rel.R.Account = o
+		}
+	}
+	return nil
+}
+
 // AddDuediligencechecklistitems adds the given related objects to the existing relationships
 // of the account, optionally inserting them as new records.
 // Appends related to o.R.Duediligencechecklistitems.
@@ -2228,6 +2897,59 @@ func (o *Account) AddDuediligencechecklistitems(ctx context.Context, exec boil.C
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &duediligencechecklistitemR{
+				Account: o,
+			}
+		} else {
+			rel.R.Account = o
+		}
+	}
+	return nil
+}
+
+// AddInvestorRestrictions adds the given related objects to the existing relationships
+// of the account, optionally inserting them as new records.
+// Appends related to o.R.InvestorRestrictions.
+// Sets related.R.Account appropriately.
+func (o *Account) AddInvestorRestrictions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*InvestorRestriction) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.AccountID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"investor_restrictions\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
+				strmangle.WhereClause("\"", "\"", 2, investorRestrictionPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.AccountID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &accountR{
+			InvestorRestrictions: related,
+		}
+	} else {
+		o.R.InvestorRestrictions = append(o.R.InvestorRestrictions, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &investorRestrictionR{
 				Account: o,
 			}
 		} else {
@@ -2446,6 +3168,133 @@ func (o *Account) AddPayments(ctx context.Context, exec boil.ContextExecutor, in
 			rel.R.Account = o
 		}
 	}
+	return nil
+}
+
+// AddServicingRestrictions adds the given related objects to the existing relationships
+// of the account, optionally inserting them as new records.
+// Appends related to o.R.ServicingRestrictions.
+// Sets related.R.Account appropriately.
+func (o *Account) AddServicingRestrictions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ServicingRestriction) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.AccountID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"servicing_restrictions\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"account_id"}),
+				strmangle.WhereClause("\"", "\"", 2, servicingRestrictionPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.AccountID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &accountR{
+			ServicingRestrictions: related,
+		}
+	} else {
+		o.R.ServicingRestrictions = append(o.R.ServicingRestrictions, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &servicingRestrictionR{
+				Account: o,
+			}
+		} else {
+			rel.R.Account = o
+		}
+	}
+	return nil
+}
+
+// SetServicingRestrictions removes all previously related items of the
+// account replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Account's ServicingRestrictions accordingly.
+// Replaces o.R.ServicingRestrictions with related.
+// Sets related.R.Account's ServicingRestrictions accordingly.
+func (o *Account) SetServicingRestrictions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ServicingRestriction) error {
+	query := "update \"servicing_restrictions\" set \"account_id\" = null where \"account_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.ServicingRestrictions {
+			queries.SetScanner(&rel.AccountID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Account = nil
+		}
+		o.R.ServicingRestrictions = nil
+	}
+
+	return o.AddServicingRestrictions(ctx, exec, insert, related...)
+}
+
+// RemoveServicingRestrictions relationships from objects passed in.
+// Removes related items from R.ServicingRestrictions (uses pointer comparison, removal does not keep order)
+// Sets related.R.Account.
+func (o *Account) RemoveServicingRestrictions(ctx context.Context, exec boil.ContextExecutor, related ...*ServicingRestriction) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.AccountID, nil)
+		if rel.R != nil {
+			rel.R.Account = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("account_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.ServicingRestrictions {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.ServicingRestrictions)
+			if ln > 1 && i < ln-1 {
+				o.R.ServicingRestrictions[i] = o.R.ServicingRestrictions[ln-1]
+			}
+			o.R.ServicingRestrictions = o.R.ServicingRestrictions[:ln-1]
+			break
+		}
+	}
+
 	return nil
 }
 

@@ -22,5 +22,13 @@ type AccountRecentResponse struct {
 }
 
 type AccountReadResponse struct {
-	Account Accounts `json:"account"`
+	Account            Accounts           `json:"account"`
+	RestrictionSummary RestrictionSummary `json:"restriction_summary"`
+}
+
+type RestrictionSummary struct {
+	IsRestricted     bool     `json:"is_restricted"`
+	Status           string   `json:"status"`
+	LockReason       string   `json:"lock_reason"`
+	RestrictedFields []string `json:"restricted_fields"`
 }

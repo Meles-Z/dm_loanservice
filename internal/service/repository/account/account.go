@@ -12,6 +12,7 @@ import (
 
 	redisLib "dm_loanservice/drivers/redis"
 
+	"github.com/aarondl/null/v8"
 	"github.com/aarondl/sqlboiler/v4/boil"
 	"github.com/aarondl/sqlboiler/v4/queries/qm"
 	"github.com/go-redis/redis/v8"
@@ -241,4 +242,175 @@ func (r *repository) MortgagePerformance(ctx context.Context) (*dashboard.Mortga
 		Redemptions: redemptions,
 		NetGrowth:   netGrowth,
 	}, nil
+}
+
+func (r *repository) AccountUpdate(
+	ctx context.Context,
+	acc dbmodels.Account,
+	updateCols []string,
+) (*dbmodels.Account, error) {
+
+	acc.UpdatedAt = null.TimeFrom(time.Now())
+	updateCols = append(updateCols, dbmodels.AccountColumns.UpdatedAt)
+
+	_, err := acc.Update(ctx, r.db, boil.Whitelist(updateCols...))
+	if err != nil {
+		return nil, fmt.Errorf("failed to update account: %w", err)
+	}
+
+	return &acc, nil
+}
+func (r *repository) ListEligibleAccounts(
+	ctx context.Context,
+	page, pageSize int,
+	mortgageType, region string,
+	ltvMin, ltvMax float64,
+	arrearsDaysMax int,
+	originationFrom, originationTo string,
+	propertyType string,
+	sortBy, sortDirection string,
+) (accounts []*dbmodels.Account, total int, err error) {
+
+	args := []interface{}{}
+	query := `
+		SELECT 
+			a.id,
+			a.customer_id,
+			a.product_id,
+			a.loan_amount,
+			a.balance_outstanding,
+			a.start_date,
+			a.end_date,
+			a.term_years,
+			a.arrears_flag,
+			COALESCE(a.arrears_amount,0) as arrears_amount,
+			COALESCE(a.arrears_days,0) as arrears_days,
+			a.forbearance_flag,
+			a.forbearance_type,
+			a.fraud_flag,
+			a.fraud_notes,
+			a.redraw_facility,
+			coll.id AS collateral_id,
+			coll.collateral_type,
+			coll.security_type,
+			p.id AS property_id,
+			p.address,
+			p.property_type,
+			p.region AS property_region,
+			p.valuation,
+			p.size_sqft,
+			p.year_built
+		FROM accounts a
+		JOIN collaterals coll ON coll.account_id = a.id
+		JOIN property p ON p.id = coll.property_id
+		WHERE a.deleted_at IS NULL
+	`
+
+	// Filters
+	argIdx := 1
+	if mortgageType != "" {
+		query += fmt.Sprintf(" AND p.mortgage_type = $%d", argIdx)
+		args = append(args, mortgageType)
+		argIdx++
+	}
+	if region != "" {
+		query += fmt.Sprintf(" AND p.region = $%d", argIdx)
+		args = append(args, region)
+		argIdx++
+	}
+	if ltvMin > 0 {
+		query += fmt.Sprintf(" AND a.loan_amount / NULLIF(p.valuation,0) >= $%d", argIdx)
+		args = append(args, ltvMin)
+		argIdx++
+	}
+	if ltvMax > 0 {
+		query += fmt.Sprintf(" AND a.loan_amount / NULLIF(p.valuation,0) <= $%d", argIdx)
+		args = append(args, ltvMax)
+		argIdx++
+	}
+	if arrearsDaysMax > 0 {
+		query += fmt.Sprintf(" AND a.arrears_days <= $%d", argIdx)
+		args = append(args, arrearsDaysMax)
+		argIdx++
+	}
+	if originationFrom != "" {
+		query += fmt.Sprintf(" AND a.start_date >= $%d", argIdx)
+		args = append(args, originationFrom)
+		argIdx++
+	}
+	if originationTo != "" {
+		query += fmt.Sprintf(" AND a.start_date <= $%d", argIdx)
+		args = append(args, originationTo)
+		argIdx++
+	}
+	if propertyType != "" {
+		query += fmt.Sprintf(" AND p.property_type = $%d", argIdx)
+		args = append(args, propertyType)
+		argIdx++
+	}
+
+	// Sorting
+	if sortBy != "" {
+		query += fmt.Sprintf(" ORDER BY %s %s", sortBy, sortDirection)
+	} else {
+		query += " ORDER BY a.start_date DESC"
+	}
+
+	// Pagination
+	offset := (page - 1) * pageSize
+	query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1)
+	args = append(args, pageSize, offset)
+
+	rows, err := r.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, 0, fmt.Errorf("query failed: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var acc dbmodels.Account
+		var collID, propertyID string
+		var propRegion string
+		if err := rows.Scan(
+			&acc.ID,
+			&acc.CustomerID,
+			&acc.ProductID,
+			&acc.LoanAmount,
+			&acc.BalanceOutstanding,
+			&acc.StartDate,
+			&acc.EndDate,
+			&acc.TermYears,
+			&acc.ArrearsFlag,
+			&acc.ArrearsAmount,
+			&acc.ArrearsDays,
+			&acc.ForbearanceFlag,
+			&acc.ForbearanceType,
+			&acc.FraudFlag,
+			&acc.FraudNotes,
+			&acc.RedrawFacility,
+			&collID,
+			&acc.CollateralType,
+			&acc.SecurityType,
+			&propertyID,
+			&acc.CollateralAddress, // map property address here
+			&propRegion,
+		); err != nil {
+			return nil, 0, fmt.Errorf("scan failed: %w", err)
+		}
+		accounts = append(accounts, &acc)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("rows iteration failed: %w", err)
+	}
+
+	return accounts, len(accounts), nil
+}
+
+func (r *repository) AccountCount(ctx context.Context) (int64, error) {
+	count, err := dbmodels.Accounts(qm.Where("deleted_at IS NULL")).Count(ctx, r.db)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count accounts: %w", err)
+	}
+	return count, nil
 }

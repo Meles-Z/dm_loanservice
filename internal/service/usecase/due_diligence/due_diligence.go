@@ -7,9 +7,11 @@ import (
 	ctxDM "dm_loanservice/drivers/utils/context"
 	"dm_loanservice/drivers/uuid"
 	"dm_loanservice/internal/service/domain/account"
+	accountauditlog "dm_loanservice/internal/service/domain/account_audit_log"
 	accountflag "dm_loanservice/internal/service/domain/account_flag"
 	duediligence "dm_loanservice/internal/service/domain/due_diligence"
 	"fmt"
+	"time"
 
 	"github.com/aarondl/null/v8"
 )
@@ -21,11 +23,13 @@ type Service interface {
 	DueDiligenceByAccount(context.Context, *ctxDM.Context, duediligence.DueDiligenceByAccountRequest) (*duediligence.DueDiligenceByAccountResponse, error)
 }
 
-func NewService(duediligenceRepo duediligence.Repository, accountRepo account.Repository, accFlag accountflag.Repository) Service {
+func NewService(duediligenceRepo duediligence.Repository, accountRepo account.Repository,
+	accFlag accountflag.Repository, accountAuditLog accountauditlog.Repository) Service {
 	return &svc{
 		dueDiligenceRepo: duediligenceRepo,
 		accountRepo:      accountRepo,
 		accFlagRepo:      accFlag,
+		accountAuditLog:  accountAuditLog,
 	}
 }
 
@@ -33,6 +37,7 @@ type svc struct {
 	accountRepo      account.Repository
 	dueDiligenceRepo duediligence.Repository
 	accFlagRepo      accountflag.Repository
+	accountAuditLog  accountauditlog.Repository
 }
 
 func (s *svc) DueDiligenceAdd(ctx context.Context, ctxDM *ctxDM.Context, req duediligence.DueDiligenceAddRequest) (*duediligence.DueDiligenceResponse, error) {
@@ -142,6 +147,18 @@ func (s *svc) DueDiligenceUpdate(
 		if err != nil {
 			return nil, fmt.Errorf("failed to create account flag: %w", err)
 		}
+	}
+
+	_, err = s.accountAuditLog.AccountAuditLogAdd(ctx, dbmodels.AccountAuditLog{
+		ID:          uuid.UUID(),
+		AccountID:   req.ID,
+		Action:      null.String{String: "Account flagged", Valid: true},
+		Details:     null.String{String: "Due diligence auto-fail", Valid: true},
+		PerformedBy: null.Int{Int: int(ctxDM.UserSession.UserId), Valid: true},
+		PerformedAt: null.Time{Time: time.Now()},
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	// 6️⃣ Build API response with all items + overall status
