@@ -24,5 +24,5 @@ type Repository interface {
 	RecentArrearsCases(ctx context.Context) ([]dashboard.ArrearsCase, error)
 	RecentArrears(ctx context.Context) ([]AccountRecentResponse, error)
 	MortgagePerformance(ctx context.Context) (*dashboard.MortgagePerformance, error)
-	AccountCount(ctx context.Context) (int64, error)
+	AccountCount(ctx context.Context) (int64, float64, error)
 }

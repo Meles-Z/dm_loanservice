@@ -3,11 +3,17 @@ package securitisation
 import (
 	"bytes"
 	"context"
+	"dm_loanservice/drivers/dbmodels"
+	"dm_loanservice/drivers/utils"
 	ctxDM "dm_loanservice/drivers/utils/context"
+	"dm_loanservice/drivers/uuid"
 	"dm_loanservice/internal/service/domain/securitisation"
 	"encoding/base64"
 	"encoding/csv"
 	"fmt"
+	"strings"
+
+	"github.com/aarondl/null/v8"
 )
 
 func (s *svc) EligibleAccount(
@@ -114,7 +120,7 @@ func (s *svc) EligibleAccount(
 func (s *svc) EligibleSummary(ctx context.Context, ctxDM *ctxDM.Context) (*securitisation.EligibleAccountSummaryResponse, error) {
 
 	// count total loans
-	totalLoans, err := s.accountRepo.AccountCount(ctx)
+	totalLoans, _, err := s.accountRepo.AccountCount(ctx)
 	if err != nil {
 		ctxDM.ErrorMessage = fmt.Sprintf("failed to count accounts: %s", err.Error())
 		return nil, err
@@ -253,5 +259,269 @@ func (s *svc) EligibleAccountSummaryReport(
 
 	return &securitisation.EligibleAccountSummaryReportResponse{
 		File: encoded,
+	}, nil
+}
+
+func (s *svc) SecuritisationPoolAdd(ctx context.Context, ctxDM *ctxDM.Context, req securitisation.SecuritisationPoolAddRequest) (*securitisation.SecuritisationPoolAddResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, utils.ErrBadRequest
+	}
+
+	pool := dbmodels.SecuritisationPool{
+		ID:                       uuid.UUID(),
+		FundingSource:            req.FundingSource,
+		ServicingRole:            req.ServicingRole,
+		SPVName:                  req.SPVName,
+		SPVJurisdiction:          req.SPVJurisdiction,
+		PoolAllocationDate:       req.PoolAllocationDate,
+		LoanTransferDate:         req.LoanTransferDate,
+		CurrentPoolBalance:       req.CurrentPoolBalance,
+		Factor:                   req.Factor,
+		NoteClass:                req.NoteClass,
+		InterestRemittanceDate:   req.InterestRemittance,
+		PrincipalRemittanceDate:  req.PrincipalRemittance,
+		ServicingFeeRate:         req.ServicingFeeRate,
+		ReportingCurrency:        req.ReportingCurrency,
+		EsmaAssetCode:            null.String{String: req.ESMAAssetCode, Valid: true},
+		CreditEnhancementType:    req.CreditEnhancementType,
+		InvestorReportIdentifier: null.String{String: req.InvestorReportIdentifier, Valid: true},
+	}
+
+	newPool, err := s.securitisationRepo.SecuritisationPoolAdd(ctx, pool)
+	if err != nil {
+		return nil, err
+	}
+	mappedPool := mapSecuritisationPool(newPool)
+	return &securitisation.SecuritisationPoolAddResponse{
+		Pool: mappedPool,
+	}, nil
+}
+
+func (s *svc) SecuritisationPoolRead(ctx context.Context, ctxDM *ctxDM.Context, req securitisation.SecuritisationPoolReadRequest) (*securitisation.SecuritisationPoolReadResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, utils.ErrBadRequest
+	}
+	pool, err := s.securitisationRepo.SecuritisationPoolRead(ctx, req.ID)
+	if err != nil {
+		return nil, err
+	}
+	mappedPool := mapSecuritisationPool(pool)
+	return &securitisation.SecuritisationPoolReadResponse{
+		Pool: mappedPool,
+	}, nil
+}
+
+func (s *svc) SecuritisationPoolUpdate(ctx context.Context, ctxDM *ctxDM.Context, req securitisation.SecuritisationPoolUpdateRequest) (*securitisation.SecuritisationPoolUpdateResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, utils.ErrBadRequest
+	}
+	pool, err := s.securitisationRepo.SecuritisationPoolRead(ctx, req.ID)
+	if err != nil {
+		return nil, err
+	}
+	if pool.EsmaAssetCode.Valid {
+		pool.EsmaAssetCode = null.String{String: *req.ESMAAssetCode, Valid: true}
+	}
+	if pool.InvestorReportIdentifier.Valid {
+		pool.InvestorReportIdentifier = null.String{String: *req.InvestorReportIdentifier, Valid: true}
+	}
+
+	_, err = s.securitisationRepo.SecuritisationPoolUpdate(ctx, *pool, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	mappedPool := mapSecuritisationPool(pool)
+	return &securitisation.SecuritisationPoolUpdateResponse{
+		Pool: mappedPool,
+	}, nil
+}
+
+func (s *svc) SecuritisationPoolAll(ctx context.Context, ctxDM *ctxDM.Context) (*securitisation.SecuritisationPoolAllResponse, error) {
+	pools, err := s.securitisationRepo.SecuritisationPoolAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mappedPools := make([]*securitisation.SecuritisationPool, len(pools))
+	for i, p := range pools {
+		mappedPools[i] = mapSecuritisationPool(p)
+	}
+	return &securitisation.SecuritisationPoolAllResponse{
+		Pools: mappedPools,
+	}, nil
+}
+
+func (s *svc) SecuritisationDelete(ctx context.Context, ctxDM *ctxDM.Context, req securitisation.SecuritisationDeleteRequest) (string, error) {
+	if err := req.Validate(); err != nil {
+		return "", utils.ErrBadRequest
+	}
+	return "deleted", s.securitisationRepo.SecuritisationPoolDelete(ctx, req.ID)
+}
+
+func (s *svc) SecuritisationDashboard(ctx context.Context, ctxDM *ctxDM.Context) (*securitisation.DashboardEligibleAccountResponse, error) {
+	// count total loans
+	totalLoans, outstanding, err := s.accountRepo.AccountCount(ctx)
+	if err != nil {
+		ctxDM.ErrorMessage = fmt.Sprintf("failed to count accounts: %s", err.Error())
+		return nil, err
+	}
+
+	// DD summary
+	ddPass, ddPending, ddFail, err := s.dueDiligenceRepo.DueDiligenceStatusSummary(ctx)
+	if err != nil {
+		ctxDM.ErrorMessage = "failed to get DD summary"
+		return nil, err
+	}
+
+	// flag summary
+	secReady, secExcluded, manualReview, err := s.accountflagRepo.AccountFlagSummary(ctx)
+	if err != nil {
+		ctxDM.ErrorMessage = "failed to get flag summary"
+		return nil, err
+	}
+
+	// eligibility logic (business-approved)
+	eligible := ddPass
+	eligible -= ddFail + ddPending
+	eligible -= secExcluded + manualReview
+	if eligible < 0 {
+		eligible = 0
+	}
+
+	ineligible := totalLoans - eligible
+
+	return &securitisation.DashboardEligibleAccountResponse{
+		TotalLoans:       totalLoans,
+		EligibleLoans:    eligible,
+		IneligibleLoans:  ineligible,
+		TotalOutstanding: outstanding,
+		DueDiligenceSummary: securitisation.DueDiligenceSummary{
+			Pass:    int(ddPass),
+			Fail:    int(ddFail),
+			Pending: int(ddPending),
+		},
+		FlagSummary: securitisation.FlagSummary{
+			SecReady:     int(secReady),
+			SecExcluded:  int(secExcluded),
+			ManualReview: int(manualReview),
+		},
+	}, nil
+}
+
+func (s *svc) SecuritisationDashboardExport(
+	ctx context.Context,
+	ctxDM *ctxDM.Context,
+	req securitisation.DashboardExportRequest,
+) (*securitisation.DashboardExportResponse, error) {
+
+	// 1️⃣ Validate format
+	format := strings.ToLower(req.Format)
+	if format != "csv" && format != "xlsx" {
+		return nil, fmt.Errorf("invalid format: must be csv or xlsx")
+	}
+
+	// 2️⃣ Load dashboard data using your existing function
+	dashboard, err := s.SecuritisationDashboard(ctx, ctxDM)
+	if err != nil {
+		return nil, err
+	}
+
+	// 3️⃣ Generate export based on format
+	switch format {
+
+	case "csv":
+		fileBytes, err := generateDashboardCSV(dashboard)
+		if err != nil {
+			ctxDM.ErrorMessage = fmt.Sprintf("csv generation failed: %s", err.Error())
+			return nil, err
+		}
+
+		return &securitisation.DashboardExportResponse{
+			FileName: "securitisation_dashboard.csv",
+			MimeType: "text/csv",
+			FileData: base64.StdEncoding.EncodeToString(fileBytes),
+		}, nil
+
+	case "xlsx":
+		fileBytes, err := generateDashboardXLSX(dashboard)
+		if err != nil {
+			ctxDM.ErrorMessage = fmt.Sprintf("xlsx generation failed: %s", err.Error())
+			return nil, err
+		}
+
+		return &securitisation.DashboardExportResponse{
+			FileName: "securitisation_dashboard.xlsx",
+			MimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			FileData: base64.StdEncoding.EncodeToString(fileBytes),
+		}, nil
+	}
+
+	return nil, nil
+}
+
+func (s *svc) SecuritisationPoolReport(ctx context.Context, ctxDM *ctxDM.Context, req securitisation.SecuritisationPoolReportRequest) (*securitisation.SecuritisationPoolReportResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, utils.ErrBadRequest
+	}
+	pool, err := s.securitisationRepo.SecuritisationPoolRead(ctx, req.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// count total loans
+	totalLoans, outstanding, err := s.accountRepo.AccountCount(ctx)
+	if err != nil {
+		ctxDM.ErrorMessage = fmt.Sprintf("failed to count accounts: %s", err.Error())
+		return nil, err
+	}
+
+	// DD summary
+	ddPass, ddPending, ddFail, err := s.dueDiligenceRepo.DueDiligenceStatusSummary(ctx)
+	if err != nil {
+		ctxDM.ErrorMessage = "failed to get DD summary"
+		return nil, err
+	}
+
+	// flag summary
+	secReady, secExcluded, manualReview, err := s.accountflagRepo.AccountFlagSummary(ctx)
+	if err != nil {
+		ctxDM.ErrorMessage = "failed to get flag summary"
+		return nil, err
+	}
+
+	// eligibility logic (business-approved)
+	eligible := ddPass
+	eligible -= ddFail + ddPending
+	eligible -= secExcluded + manualReview
+	if eligible < 0 {
+		eligible = 0
+	}
+
+	ineligible := totalLoans - eligible
+
+	return &securitisation.SecuritisationPoolReportResponse{
+		PoolID:             pool.ID,
+		SPVName:            pool.SPVName,
+		FundingSource:      pool.FundingSource,
+		PoolAllocationDate: pool.PoolAllocationDate.String(),
+		LoanTransferDate:   pool.LoanTransferDate.String(),
+		NoteClass:          pool.NoteClass,
+		ReportingCurrency:  pool.ReportingCurrency,
+		//
+		TotalLoans:       totalLoans,
+		EligibleLoans:    eligible,
+		IneligibleLoans:  ineligible,
+		TotalOutstanding: outstanding,
+		//
+		DDSummary: securitisation.DueDiligenceSummary{
+			Pass:    int(ddPass),
+			Fail:    int(ddFail),
+			Pending: int(ddPending),
+		},
+		FlagSummary: securitisation.FlagSummary{
+			SecReady:     int(secReady),
+			SecExcluded:  int(secExcluded),
+			ManualReview: int(manualReview),
+		},
 	}, nil
 }

@@ -407,10 +407,25 @@ func (r *repository) ListEligibleAccounts(
 	return accounts, len(accounts), nil
 }
 
-func (r *repository) AccountCount(ctx context.Context) (int64, error) {
-	count, err := dbmodels.Accounts(qm.Where("deleted_at IS NULL")).Count(ctx, r.db)
+func (r *repository) AccountCount(ctx context.Context) (int64, float64, error) {
+	// 1. Count accounts
+	count, err := dbmodels.Accounts(
+		qm.Where("deleted_at IS NULL"),
+	).Count(ctx, r.db)
 	if err != nil {
-		return 0, fmt.Errorf("failed to count accounts: %w", err)
+		return 0, 0.0, fmt.Errorf("failed to count accounts: %w", err)
 	}
-	return count, nil
+
+	// 2. Sum balance_outstanding
+	row := dbmodels.Accounts(
+		qm.Where("deleted_at IS NULL"),
+		qm.Select("COALESCE(SUM(balance_outstanding), 0)"),
+	).QueryRow(r.db)
+
+	var totalOutstanding float64
+	if err := row.Scan(&totalOutstanding); err != nil {
+		return 0, 0, fmt.Errorf("failed to scan total outstanding: %w", err)
+	}
+
+	return count, totalOutstanding, nil
 }

@@ -49,9 +49,17 @@ type Endpoints struct {
 	InvestorRestrictionAdd  endpoint.Endpoint
 	InvestorRestrictionRead endpoint.Endpoint
 	// securitisation
-	EligibleAccount              endpoint.Endpoint
-	EligibleAccountSummary       endpoint.Endpoint
-	EligibleAccountSummaryReport endpoint.Endpoint
+	EligibleAccount               endpoint.Endpoint
+	EligibleAccountSummary        endpoint.Endpoint
+	EligibleAccountSummaryReport  endpoint.Endpoint
+	SecuritisationPoolAdd         endpoint.Endpoint
+	SecuritisationPoolRead        endpoint.Endpoint
+	SecuritisationPoolUpdate      endpoint.Endpoint
+	SecuritisationPoolAll         endpoint.Endpoint
+	SecuritisationDelete          endpoint.Endpoint
+	SecuritisationDashboard       endpoint.Endpoint
+	SecuritisationDashboardExport endpoint.Endpoint
+	SecuritisationPoolReport      endpoint.Endpoint
 
 	// product
 	ProductAdd                  endpoint.Endpoint
@@ -116,9 +124,17 @@ func NewEndpoints(
 		InvestorRestrictionAdd:  makeInvestorRestrictionAddEndpoint(investorRestrictionSvc),
 		InvestorRestrictionRead: makeInvestorRestrictionReadEndpoint(investorRestrictionSvc),
 		// securitisation
-		EligibleAccount:              makeAccountEligibleEndpoint(securitisationSvc),
-		EligibleAccountSummary:       MakeEligibleAccountSummaryHandler(securitisationSvc),
-		EligibleAccountSummaryReport: MakeEligibleAccountSummaryReportHandler(securitisationSvc),
+		EligibleAccount:               makeAccountEligibleEndpoint(securitisationSvc),
+		EligibleAccountSummary:        MakeEligibleAccountSummaryHandler(securitisationSvc),
+		EligibleAccountSummaryReport:  MakeEligibleAccountSummaryReportHandler(securitisationSvc),
+		SecuritisationPoolAdd:         MakeSecuritisationPoolAddHandler(securitisationSvc),
+		SecuritisationPoolRead:        MakeSecuritisationPoolReadHandler(securitisationSvc),
+		SecuritisationPoolUpdate:      MakeSecuritisationPoolUpdateHandler(securitisationSvc),
+		SecuritisationPoolAll:         MakeSecuritisationPoolAllHandler(securitisationSvc),
+		SecuritisationDelete:          MakeSecuritisationDeleteHandler(securitisationSvc),
+		SecuritisationDashboard:       MakeSecuritisationDashboardHandler(securitisationSvc),
+		SecuritisationDashboardExport: MakeSecuritisationDashboardExportHandler(securitisationSvc),
+		SecuritisationPoolReport:      MakeSecuritisationPoolReportHandler(securitisationSvc),
 
 		LateFeeRuleAdd:    makeLateFeeRuleAddEndpoint(lateFeeRuleSvc),
 		LateFeeRuleRead:   makeLateFeeRuleReadEndpoint(lateFeeRuleSvc),

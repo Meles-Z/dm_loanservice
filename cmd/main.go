@@ -20,6 +20,7 @@ import (
 	duediligenceR "dm_loanservice/internal/service/repository/due_diligence"
 	investorRestrictionR "dm_loanservice/internal/service/repository/investor_restriction"
 	lateFeeRuleR "dm_loanservice/internal/service/repository/late_fee_rule"
+	securitisationR "dm_loanservice/internal/service/repository/securitisation"
 	serviceRestrictionR "dm_loanservice/internal/service/repository/service_restriction"
 	accountSvc "dm_loanservice/internal/service/usecase/account"
 	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
@@ -101,6 +102,7 @@ func main() {
 	investorRestrictionRepo := investorRestrictionR.NewRepository(pgdb)
 	accountLockRuleRepo := accountLockRuleR.NewRepository(pgdb)
 	collateralRepo := collateralR.NewRepository(pgdb)
+	securitisationRepo := securitisationR.NewRepository(pgdb)
 	redisConn := redisLib.GetConnection(context.Background())
 	_ = redisConn
 
@@ -114,7 +116,7 @@ func main() {
 		accountLockRuleSvc.NewService(accountLockRuleRepo, accountRepo),
 		serviceRestrictionSvc.NewService(serviceRestrictionRepo, accountRepo, investorRestrictionRepo, accountLockRuleRepo),
 		investorRestrictionSvc.NewService(investorRestrictionRepo, accountRepo),
-		securitisationSvc.NewService(accountRepo, nil, duediligenceRepo, accountFlagRepo, collateralRepo),
+		securitisationSvc.NewService(securitisationRepo, accountRepo, nil, duediligenceRepo, accountFlagRepo, collateralRepo),
 	)
 
 	// define gothic provider

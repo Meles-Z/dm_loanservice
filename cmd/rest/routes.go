@@ -57,6 +57,14 @@ func initRoutes(ctx context.Context, e ie.Endpoints) *mux.Router {
 	securitisationRouter.Handle("", ithttp.MakeEligibleAccountHandler(middleware.AuthMiddleware()(e.EligibleAccount))).Methods(http.MethodGet)
 	securitisationRouter.Handle("", ithttp.MakeEligibleAccountSummaryHandler(middleware.AuthMiddleware()(e.EligibleAccountSummary))).Methods(http.MethodGet)
 	securitisationRouter.Handle("", ithttp.MakeEligibleAccountSummaryReportHandler(middleware.AuthMiddleware()(e.EligibleAccountSummaryReport))).Methods(http.MethodGet)
+	securitisationRouter.Handle("", ithttp.MakeSecuritisationPoolAddHandler(middleware.AuthMiddleware()(e.SecuritisationPoolAdd))).Methods(http.MethodPost)
+	securitisationRouter.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationPoolReadHandler(middleware.AuthMiddleware()(e.SecuritisationPoolRead))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationPoolUpdateHandler(middleware.AuthMiddleware()(e.SecuritisationPoolUpdate))).Methods(http.MethodPut)
+	securitisationRouter.Handle("", ithttp.MakeSecuritisationPoolAllHandler(middleware.AuthMiddleware()(e.SecuritisationPoolAll))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationDeleteHandler(middleware.AuthMiddleware()(e.SecuritisationDelete))).Methods(http.MethodDelete)
+	securitisationRouter.Handle("/dashboard", ithttp.MakeSecuritisationDashboardHandler(middleware.AuthMiddleware()(e.SecuritisationDashboard))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/dashboard/export", ithttp.MakeSecuritisationDashboardExportHandler(middleware.AuthMiddleware()(e.SecuritisationDashboardExport))).Methods(http.MethodPost)
+	securitisationRouter.Handle("/pool/{id:[0-9a-fA-F-]+}/report", ithttp.MakeSecuritisationPoolReportHandler(middleware.AuthMiddleware()(e.SecuritisationPoolReport))).Methods(http.MethodGet)
 
 	return r
 }
