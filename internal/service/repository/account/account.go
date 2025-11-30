@@ -260,6 +260,7 @@ func (r *repository) AccountUpdate(
 
 	return &acc, nil
 }
+
 func (r *repository) ListEligibleAccounts(
 	ctx context.Context,
 	page, pageSize int,
@@ -303,16 +304,18 @@ func (r *repository) ListEligibleAccounts(
 		FROM accounts a
 		JOIN collaterals coll ON coll.account_id = a.id
 		JOIN property p ON p.id = coll.property_id
+		JOIN products pr ON pr.id = a.product_id
 		WHERE a.deleted_at IS NULL
 	`
 
 	// Filters
 	argIdx := 1
 	if mortgageType != "" {
-		query += fmt.Sprintf(" AND p.mortgage_type = $%d", argIdx)
+		query += fmt.Sprintf(" AND pr.mortgage_type::TEXT = $%d", argIdx)
 		args = append(args, mortgageType)
 		argIdx++
 	}
+
 	if region != "" {
 		query += fmt.Sprintf(" AND p.region = $%d", argIdx)
 		args = append(args, region)

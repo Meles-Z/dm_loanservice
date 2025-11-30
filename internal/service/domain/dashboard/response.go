@@ -1,14 +1,18 @@
 package dashboard
 
+import (
+	productPb "github.com/brianjobling/dm_proto/generated/productservice/productpb"
+)
+
 type (
 	// Root dashboard response
 	DashboardResponse struct {
-		PortfolioMetrics    PortfolioMetrics    `json:"portfolioMetrics"`
-		RecentArrearsCases  []ArrearsCase       `json:"recentArrearsCases"`
-		TaskHub             []TaskItem          `json:"taskHub"`
-		RecentSearches      []string            `json:"recentSearches"`
-		MortgagePerformance MortgagePerformance `json:"mortgagePerformance"`
-		ProductOverview     ProductOverview     `json:"productOverview"`
+		PortfolioMetrics    PortfolioMetrics             `json:"portfolioMetrics"`
+		RecentArrearsCases  []ArrearsCase                `json:"recentArrearsCases"`
+		TaskHub             []TaskItem                   `json:"taskHub"`
+		RecentSearches      []string                     `json:"recentSearches"`
+		MortgagePerformance MortgagePerformance          `json:"mortgagePerformance"`
+		ProductOverview     *productPb.ProductOverviewRes `json:"productOverview"`
 	}
 
 	// === Portfolio metrics section ===
@@ -22,7 +26,7 @@ type (
 	TotalArrears struct {
 		Count int     `json:"count"`
 		Value float64 `json:"value"`
-		Trend float64     `json:"trend"`
+		Trend float64 `json:"trend"`
 	}
 
 	UpcomingPayments struct {

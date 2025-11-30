@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	"github.com/brianjobling/dm_proto/generated/userservice/customerpb"
+	"github.com/brianjobling/dm_proto/generated/customerservice/customerpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

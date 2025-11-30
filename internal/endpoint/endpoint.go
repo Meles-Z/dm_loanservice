@@ -5,11 +5,13 @@ import (
 	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
 	accountflagSvc "dm_loanservice/internal/service/usecase/account_flag"
 	accountLockRuleSvc "dm_loanservice/internal/service/usecase/account_lock_rule"
+	dashboardSvc "dm_loanservice/internal/service/usecase/dashboard"
 	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
 	investorRestrictionSvc "dm_loanservice/internal/service/usecase/investor_restriction"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
 	securitisationSvc "dm_loanservice/internal/service/usecase/securitisation"
 	serviceRestrictionSvc "dm_loanservice/internal/service/usecase/service_restriction"
+	tasksSvc "dm_loanservice/internal/service/usecase/tasks"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -35,6 +37,9 @@ type Endpoints struct {
 
 	// account audit log
 	AccountAuditLogRead endpoint.Endpoint
+
+	// dashboard
+	PortfolioSummary endpoint.Endpoint
 
 	// account lock rule
 	AccountLockRuleAdd  endpoint.Endpoint
@@ -71,6 +76,11 @@ type Endpoints struct {
 	ProductOverpaymentLimit     endpoint.Endpoint
 	ProductOverpaymentCalculate endpoint.Endpoint
 
+	// Tasks
+	TaskAdd        endpoint.Endpoint
+	RecentTaskList endpoint.Endpoint
+	TaskSummary    endpoint.Endpoint
+
 	// lateFeeRule
 	LateFeeRuleAdd    endpoint.Endpoint
 	LateFeeRuleRead   endpoint.Endpoint
@@ -86,7 +96,9 @@ func NewEndpoints(
 	accountLockRuleSvc accountLockRuleSvc.Service,
 	serviceRestrictionSvc serviceRestrictionSvc.Service,
 	investorRestrictionSvc investorRestrictionSvc.Service,
+	dashboardSvc dashboardSvc.Service,
 	securitisationSvc securitisationSvc.Service,
+	tasksSvc tasksSvc.Service,
 
 ) Endpoints {
 	return Endpoints{
@@ -115,6 +127,8 @@ func NewEndpoints(
 		AccountLockRuleAdd:  makeAccountLockRuleAddEndpoint(accountLockRuleSvc),
 		AccountLockRuleRead: makeAccountLockRuleReadEndpoint(accountLockRuleSvc),
 
+		// dashboard
+		PortfolioSummary: makeDashboardEndpoint(dashboardSvc),
 		// service restriction
 		ServiceRestrictionAdd:           makeServiceRestrictionAddEndpoint(serviceRestrictionSvc),
 		ServiceRestrictionRead:          makeServiceRestrictionReadEndpoint(serviceRestrictionSvc),
@@ -123,6 +137,12 @@ func NewEndpoints(
 		// investor restriction
 		InvestorRestrictionAdd:  makeInvestorRestrictionAddEndpoint(investorRestrictionSvc),
 		InvestorRestrictionRead: makeInvestorRestrictionReadEndpoint(investorRestrictionSvc),
+
+		// tasks
+		TaskAdd:        makeTaskAddEndpoint(tasksSvc),
+		RecentTaskList: makeRecentTaskEndpoint(tasksSvc),
+		TaskSummary:    makeTaskSummaryEndpoint(tasksSvc),
+
 		// securitisation
 		EligibleAccount:               makeAccountEligibleEndpoint(securitisationSvc),
 		EligibleAccountSummary:        MakeEligibleAccountSummaryHandler(securitisationSvc),

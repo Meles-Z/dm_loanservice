@@ -8,24 +8,26 @@ import (
 	"net"
 	"strings"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
-
 	"dm_loanservice/drivers/goconf"
 	jwtLib "dm_loanservice/drivers/jwt"
 	"dm_loanservice/drivers/logger"
 	Logger "dm_loanservice/drivers/logger/zap"
 	"dm_loanservice/drivers/utils"
 	ctxDM "dm_loanservice/drivers/utils/context"
+
+	pbAccount "github.com/brianjobling/dm_proto/generated/accountservice/accountpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 const SessionID = "Session_Id"
 
 func RunServer(
 	ctx context.Context,
+	pbAccountServer pbAccount.AccountServiceServer,
 	port string,
 ) error {
 	listen, err := net.Listen("tcp", ":"+port)
@@ -57,6 +59,7 @@ func RunServer(
 	}
 
 	server := grpc.NewServer(opts...)
+	pbAccount.RegisterAccountServiceServer(server, pbAccountServer)
 
 	logger.LogInfo("status-gRPC", "listening", "port", port)
 	return server.Serve(listen)

@@ -1,4 +1,4 @@
-package customerpb
+package iniquiriespb
 
 import (
 	"context"
@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/brianjobling/dm_proto/generated/customerservice/customerpb"
+	pb "github.com/brianjobling/dm_proto/generated/customerservice/customer_iniquiriespb"
 	"github.com/spf13/viper"
 )
 
 // In dm_loanservice/drivers/customerservice/customerpb/wrapper_impl.go
-func SetupWrapper(conf *viper.Viper) *customerServiceWrapper {
-	w := &customerServiceWrapper{}
+func SetupWrapper(conf *viper.Viper) *customerInquiriesServiceWrapper {
+	w := &customerInquiriesServiceWrapper{}
 
 	fmt.Printf("Connecting to customer service at: %s\n", conf.GetString("customerservice.address"))
 	fmt.Printf("TLS enabled: %v\n", conf.GetBool("customerservice.tls_enabled"))
@@ -32,7 +32,7 @@ func SetupWrapper(conf *viper.Viper) *customerServiceWrapper {
 		panic("gRPC connection is nil")
 	}
 
-	w.client = customerpb.NewCustomerServiceClient(w.rpcCon.Conn)
+	w.client = pb.NewCustomerInquiriesServiceClient(w.rpcCon.Conn)
 
 	// Test the connection state
 	state := w.rpcCon.Conn.GetState()
@@ -41,22 +41,42 @@ func SetupWrapper(conf *viper.Viper) *customerServiceWrapper {
 	return w
 }
 
-type customerServiceWrapper struct {
+type customerInquiriesServiceWrapper struct {
 	rpcCon *RpcClient.RpcConnection
-	client customerpb.CustomerServiceClient
+	client pb.CustomerInquiriesServiceClient
 	config *viper.Viper
 }
 
-func (s *customerServiceWrapper) FindByProductID(ctxSess *ctxDM.Context, productID string) (resp []*customerpb.Customers, err error) {
-	fmt.Println("Here is the first pralace of grpc")
-	grpcCtx := s.rpcCon.CreateContext(context.Background(), ctxSess)
-	out, err := s.client.CustomerByProductID(grpcCtx, &customerpb.CustomerByProductReq{
-		ProductID: productID,
-	})
+func (s *customerInquiriesServiceWrapper) CustomerInquiriesPendingCount(
+	ctxDm *ctxDM.Context,
+) (*pb.CustomerInquiriesPendingCountRes, error) {
+
+	grpcCtx := s.rpcCon.CreateContext(context.Background(), ctxDm)
+
+	out, err := s.client.CustomerInquiriesPendingCount(
+		grpcCtx,
+		&pb.CustomerInquiriesPendingCountReq{},
+	)
 	if err != nil {
 		return nil, err
 	}
-	resp = out.Customers
-	fmt.Println("Called callled callled::::")
-	return
+
+	return out, nil
+}
+
+func (s *customerInquiriesServiceWrapper) CustomerInquiriesUrgentCount(
+	ctxDm *ctxDM.Context,
+) (*pb.CustomerInquiriesUrgentCountRes, error) {
+
+	grpcCtx := s.rpcCon.CreateContext(context.Background(), ctxDm)
+
+	out, err := s.client.CustomerInquiriesUrgentCount(
+		grpcCtx,
+		&pb.CustomerInquiriesUrgentCountReq{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return out, nil
 }

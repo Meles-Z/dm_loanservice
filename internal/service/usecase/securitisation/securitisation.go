@@ -12,6 +12,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/aarondl/null/v8"
 )
@@ -80,7 +81,6 @@ func (s *svc) EligibleAccount(
 		for _, f := range flags {
 			flagNames = append(flagNames, f.FlagType)
 		}
-
 		// 2.5 Compute Securitisation Eligibility
 		eligibility := computeEligibility(dd.Status, flagNames)
 
@@ -311,27 +311,126 @@ func (s *svc) SecuritisationPoolRead(ctx context.Context, ctxDM *ctxDM.Context, 
 	}, nil
 }
 
-func (s *svc) SecuritisationPoolUpdate(ctx context.Context, ctxDM *ctxDM.Context, req securitisation.SecuritisationPoolUpdateRequest) (*securitisation.SecuritisationPoolUpdateResponse, error) {
+func (s *svc) SecuritisationPoolUpdate(
+	ctx context.Context,
+	ctxDM *ctxDM.Context,
+	req securitisation.SecuritisationPoolUpdateRequest,
+) (*securitisation.SecuritisationPoolUpdateResponse, error) {
+
+	// 1️⃣ Validate request
 	if err := req.Validate(); err != nil {
 		return nil, utils.ErrBadRequest
 	}
+
+	// 2️⃣ Read existing pool
 	pool, err := s.securitisationRepo.SecuritisationPoolRead(ctx, req.ID)
 	if err != nil {
 		return nil, err
 	}
-	if pool.EsmaAssetCode.Valid {
-		pool.EsmaAssetCode = null.String{String: *req.ESMAAssetCode, Valid: true}
+
+	// 3️⃣ Prepare dynamic update column list
+	var updateCols []string
+
+	// ---------- STRING FIELDS ----------
+	if req.FundingSource != nil {
+		pool.FundingSource = *req.FundingSource
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.FundingSource)
 	}
-	if pool.InvestorReportIdentifier.Valid {
+	if req.ServicingRole != nil {
+		pool.ServicingRole = *req.ServicingRole
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.ServicingRole)
+	}
+	if req.SPVName != nil {
+		pool.SPVName = *req.SPVName
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.SPVName)
+	}
+	if req.SPVJurisdiction != nil {
+		pool.SPVJurisdiction = *req.SPVJurisdiction
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.SPVJurisdiction)
+	}
+	if req.NoteClass != nil {
+		pool.NoteClass = *req.NoteClass
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.NoteClass)
+	}
+	if req.ReportingCurrency != nil {
+		pool.ReportingCurrency = *req.ReportingCurrency
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.ReportingCurrency)
+	}
+	if req.CreditEnhancementType != nil {
+		pool.CreditEnhancementType = *req.CreditEnhancementType
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.CreditEnhancementType)
+	}
+	if req.ESMAAssetCode != nil {
+		pool.EsmaAssetCode = null.String{String: *req.ESMAAssetCode, Valid: true}
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.EsmaAssetCode)
+	}
+	if req.InvestorReportIdentifier != nil {
 		pool.InvestorReportIdentifier = null.String{String: *req.InvestorReportIdentifier, Valid: true}
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.InvestorReportIdentifier)
 	}
 
-	_, err = s.securitisationRepo.SecuritisationPoolUpdate(ctx, *pool, nil)
+	// ---------- DATE FIELDS ----------
+	if req.PoolAllocationDate != nil {
+		t, err := time.Parse(time.RFC3339, *req.PoolAllocationDate)
+		if err != nil {
+			return nil, utils.ErrBadRequest
+		}
+		pool.PoolAllocationDate = t
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.PoolAllocationDate)
+	}
+
+	if req.LoanTransferDate != nil {
+		t, err := time.Parse(time.RFC3339, *req.LoanTransferDate)
+		if err != nil {
+			return nil, utils.ErrBadRequest
+		}
+		pool.LoanTransferDate = t
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.LoanTransferDate)
+	}
+
+	if req.InterestRemittance != nil {
+		t, err := time.Parse(time.RFC3339, *req.InterestRemittance)
+		if err != nil {
+			return nil, utils.ErrBadRequest
+		}
+		pool.InterestRemittanceDate = t
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.InterestRemittanceDate)
+	}
+
+	if req.PrincipalRemittance != nil {
+		t, err := time.Parse(time.RFC3339, *req.PrincipalRemittance)
+		if err != nil {
+			return nil, utils.ErrBadRequest
+		}
+		pool.PrincipalRemittanceDate = t
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.PrincipalRemittanceDate)
+	}
+
+	// ---------- DECIMAL FIELDS ----------
+	if req.CurrentPoolBalance != nil {
+		pool.CurrentPoolBalance = *req.CurrentPoolBalance
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.CurrentPoolBalance)
+	}
+
+	if req.Factor != nil {
+		pool.Factor = *req.Factor
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.Factor)
+	}
+
+	if req.ServicingFeeRate != nil {
+		pool.ServicingFeeRate = *req.ServicingFeeRate
+		updateCols = append(updateCols, dbmodels.SecuritisationPoolColumns.ServicingFeeRate)
+	}
+
+	// 4️⃣ Save to DB
+	_, err = s.securitisationRepo.SecuritisationPoolUpdate(ctx, *pool, updateCols)
 	if err != nil {
 		return nil, err
 	}
 
+	// 5️⃣ Map & return
 	mappedPool := mapSecuritisationPool(pool)
+
 	return &securitisation.SecuritisationPoolUpdateResponse{
 		Pool: mappedPool,
 	}, nil

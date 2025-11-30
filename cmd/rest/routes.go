@@ -38,6 +38,16 @@ func initRoutes(ctx context.Context, e ie.Endpoints) *mux.Router {
 	duediligenceRoutes := r.PathPrefix("/api/v1/due-diligence").Subrouter()
 	duediligenceRoutes.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeDueDiligenceReadHandler((e.DueDiligenceRead))).Methods(http.MethodGet)
 
+	// dashboard
+	dashboardRoutes := r.PathPrefix("/api/v1/dashboard").Subrouter()
+	dashboardRoutes.Handle("", ithttp.MakeDashboardHandler(e.PortfolioSummary)).Methods(http.MethodGet)
+
+	// task
+	taskRoutes := r.PathPrefix("/api/v1/task").Subrouter()
+	taskRoutes.Handle("", ithttp.MakeTaskAddHandler(e.TaskAdd)).Methods(http.MethodPost)
+	taskRoutes.Handle("/recent", ithttp.MakeRecentTaskHandler(e.RecentTaskList)).Methods(http.MethodGet)
+	taskRoutes.Handle("/tasks-summary", ithttp.MakeTaskSummaryHandler(e.TaskSummary)).Methods(http.MethodGet)
+
 	// account flag
 	accountFlagRoutes := r.PathPrefix("/api/v1/account-flag").Subrouter()
 	accountFlagRoutes.Handle("", ithttp.MakeAccountFlagAddHandler((e.AccountFlagAdd))).Methods(http.MethodPost)
@@ -54,16 +64,16 @@ func initRoutes(ctx context.Context, e ie.Endpoints) *mux.Router {
 
 	//securitisation
 	securitisationRouter := r.PathPrefix("/api/v1/securitisation").Subrouter()
-	securitisationRouter.Handle("", ithttp.MakeEligibleAccountHandler(middleware.AuthMiddleware()(e.EligibleAccount))).Methods(http.MethodGet)
-	securitisationRouter.Handle("", ithttp.MakeEligibleAccountSummaryHandler(middleware.AuthMiddleware()(e.EligibleAccountSummary))).Methods(http.MethodGet)
-	securitisationRouter.Handle("", ithttp.MakeEligibleAccountSummaryReportHandler(middleware.AuthMiddleware()(e.EligibleAccountSummaryReport))).Methods(http.MethodGet)
-	securitisationRouter.Handle("", ithttp.MakeSecuritisationPoolAddHandler(middleware.AuthMiddleware()(e.SecuritisationPoolAdd))).Methods(http.MethodPost)
-	securitisationRouter.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationPoolReadHandler(middleware.AuthMiddleware()(e.SecuritisationPoolRead))).Methods(http.MethodGet)
-	securitisationRouter.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationPoolUpdateHandler(middleware.AuthMiddleware()(e.SecuritisationPoolUpdate))).Methods(http.MethodPut)
-	securitisationRouter.Handle("", ithttp.MakeSecuritisationPoolAllHandler(middleware.AuthMiddleware()(e.SecuritisationPoolAll))).Methods(http.MethodGet)
-	securitisationRouter.Handle("/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationDeleteHandler(middleware.AuthMiddleware()(e.SecuritisationDelete))).Methods(http.MethodDelete)
+	securitisationRouter.Handle("/eligible-loans", ithttp.MakeEligibleAccountHandler(middleware.AuthMiddleware()(e.EligibleAccount))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/summary", ithttp.MakeEligibleAccountSummaryHandler(middleware.AuthMiddleware()(e.EligibleAccountSummary))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/export", ithttp.MakeEligibleAccountSummaryReportHandler(middleware.AuthMiddleware()(e.EligibleAccountSummaryReport))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/pool", ithttp.MakeSecuritisationPoolAddHandler(middleware.AuthMiddleware()(e.SecuritisationPoolAdd))).Methods(http.MethodPost)
+	securitisationRouter.Handle("/pool/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationPoolReadHandler(middleware.AuthMiddleware()(e.SecuritisationPoolRead))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/pool/{id:[0-9a-fA-F-]+}", ithttp.MakeSecuritisationPoolUpdateHandler(middleware.AuthMiddleware()(e.SecuritisationPoolUpdate))).Methods(http.MethodPut)
+	securitisationRouter.Handle("/pool", ithttp.MakeSecuritisationPoolAllHandler(middleware.AuthMiddleware()(e.SecuritisationPoolAll))).Methods(http.MethodGet)
+	securitisationRouter.Handle("/pool/{id:[0-9a-fA-F-]+}/assign-loans", ithttp.MakeSecuritisationDeleteHandler(middleware.AuthMiddleware()(e.SecuritisationDelete))).Methods(http.MethodDelete)
 	securitisationRouter.Handle("/dashboard", ithttp.MakeSecuritisationDashboardHandler(middleware.AuthMiddleware()(e.SecuritisationDashboard))).Methods(http.MethodGet)
-	securitisationRouter.Handle("/dashboard/export", ithttp.MakeSecuritisationDashboardExportHandler(middleware.AuthMiddleware()(e.SecuritisationDashboardExport))).Methods(http.MethodPost)
+	securitisationRouter.Handle("/dashboard/export", ithttp.MakeSecuritisationDashboardExportHandler(middleware.AuthMiddleware()(e.SecuritisationDashboardExport))).Methods(http.MethodGet)
 	securitisationRouter.Handle("/pool/{id:[0-9a-fA-F-]+}/report", ithttp.MakeSecuritisationPoolReportHandler(middleware.AuthMiddleware()(e.SecuritisationPoolReport))).Methods(http.MethodGet)
 
 	return r

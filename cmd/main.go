@@ -4,11 +4,13 @@ import (
 	"context"
 	cmdGrpc "dm_loanservice/cmd/grpc"
 	"dm_loanservice/cmd/rest"
+	inquiriesclient "dm_loanservice/drivers/customer_inquiriesservice/inquiriespb"
 	"dm_loanservice/drivers/dbmigrations"
 	"dm_loanservice/drivers/goconf"
 	"dm_loanservice/drivers/jwt"
 	"dm_loanservice/drivers/logger"
 	"dm_loanservice/drivers/postgres"
+	productclient "dm_loanservice/drivers/productservice/productpb"
 	redisLib "dm_loanservice/drivers/redis"
 	"dm_loanservice/drivers/validator"
 	"dm_loanservice/internal/endpoint"
@@ -22,17 +24,22 @@ import (
 	lateFeeRuleR "dm_loanservice/internal/service/repository/late_fee_rule"
 	securitisationR "dm_loanservice/internal/service/repository/securitisation"
 	serviceRestrictionR "dm_loanservice/internal/service/repository/service_restriction"
+	tasksR "dm_loanservice/internal/service/repository/task"
 	accountSvc "dm_loanservice/internal/service/usecase/account"
 	accountAuditLogSvc "dm_loanservice/internal/service/usecase/account_audit_log"
 	accountflagSvc "dm_loanservice/internal/service/usecase/account_flag"
 	accountLockRuleSvc "dm_loanservice/internal/service/usecase/account_lock_rule"
+	dashboardSvc "dm_loanservice/internal/service/usecase/dashboard"
 	duediligenceSvc "dm_loanservice/internal/service/usecase/due_diligence"
 	investorRestrictionSvc "dm_loanservice/internal/service/usecase/investor_restriction"
 	lateFeeRuleSvc "dm_loanservice/internal/service/usecase/late_fee_rule"
 	securitisationSvc "dm_loanservice/internal/service/usecase/securitisation"
 	serviceRestrictionSvc "dm_loanservice/internal/service/usecase/service_restriction"
+	tasksSvc "dm_loanservice/internal/service/usecase/tasks"
 
 	"fmt"
+
+	grpcTrans "dm_loanservice/internal/transport/grpc"
 
 	_ "github.com/lib/pq"
 	"github.com/markbates/goth"
@@ -92,6 +99,9 @@ func main() {
 	// set expiry jwt
 	jwt.SetExpiry(goconf.Config().GetInt("jwt.expire"))
 
+	// setup customer service wrapper (gRPC client)
+	inquiriesServiceWrapper := inquiriesclient.SetupWrapper(goconf.Config())
+	productServiceWrapper := productclient.SetupWrapper(goconf.Config())
 	// initialize repository
 	lateFeeRuleRepo := lateFeeRuleR.NewRepository(pgdb)
 	accountRepo := accountR.NewRepository(pgdb)
@@ -103,9 +113,11 @@ func main() {
 	accountLockRuleRepo := accountLockRuleR.NewRepository(pgdb)
 	collateralRepo := collateralR.NewRepository(pgdb)
 	securitisationRepo := securitisationR.NewRepository(pgdb)
+	taskRepo := tasksR.NewRepository(pgdb)
 	redisConn := redisLib.GetConnection(context.Background())
 	_ = redisConn
 
+	fmt.Println("We have reached here")
 	// initialize endpoints
 	e := endpoint.NewEndpoints(
 		lateFeeRuleSvc.NewService(lateFeeRuleRepo),
@@ -116,9 +128,12 @@ func main() {
 		accountLockRuleSvc.NewService(accountLockRuleRepo, accountRepo),
 		serviceRestrictionSvc.NewService(serviceRestrictionRepo, accountRepo, investorRestrictionRepo, accountLockRuleRepo),
 		investorRestrictionSvc.NewService(investorRestrictionRepo, accountRepo),
+		dashboardSvc.NewService(accountRepo, inquiriesServiceWrapper, taskRepo, productServiceWrapper),
 		securitisationSvc.NewService(securitisationRepo, accountRepo, nil, duediligenceRepo, accountFlagRepo, collateralRepo),
+		tasksSvc.NewService(taskRepo),
 	)
 
+	fmt.Println("We have reached here 2")
 	// define gothic provider
 	goth.UseProviders(
 		google.New(
@@ -140,9 +155,13 @@ func main() {
 		_ = rest.RunServer(ctx, e, goconf.Config().GetString("rest.port"))
 	}()
 
+	accountServer := grpcTrans.NewAccountServer(e)
+
+	fmt.Println("We have reached here 3")
 	// run grpc server
 	grpcServer := cmdGrpc.RunServer(
 		ctx,
+		accountServer,
 		goconf.Config().GetString("grpc.port"),
 	)
 	if grpcServer != nil {

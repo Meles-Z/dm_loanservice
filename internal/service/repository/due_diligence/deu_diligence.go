@@ -86,7 +86,7 @@ func (r *repository) DueDiligenceStatusSummary(ctx context.Context) (pass, pendi
                 WHEN SUM(CASE WHEN status = 'pending' THEN 1 END) > 0 THEN 'pending'
                 ELSE 'pass'
             END AS final_status
-        FROM due_diligence_checklist_items
+        FROM duediligencechecklistitems
         GROUP BY account_id;
     `
 
@@ -115,7 +115,6 @@ func (r *repository) DueDiligenceStatusSummary(ctx context.Context) (pass, pendi
 }
 
 
-
 func (r *repository) GetDDStatusMap(ctx context.Context) (map[string]string, error) {
 	query := `
         SELECT account_id,
@@ -124,10 +123,9 @@ func (r *repository) GetDDStatusMap(ctx context.Context) (map[string]string, err
                 WHEN SUM(CASE WHEN status = 'pending' THEN 1 END) > 0 THEN 'pending'
                 ELSE 'pass'
             END AS final_status
-        FROM due_diligence_checklist_items
+        FROM duediligencechecklistitems
         GROUP BY account_id;
     `
-
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
