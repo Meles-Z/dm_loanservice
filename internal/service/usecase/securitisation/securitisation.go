@@ -50,7 +50,7 @@ func (s *svc) EligibleAccount(
 	for _, acc := range accounts {
 
 		// 2.1 Fetch Borrower
-		cust, err := s.customerRepo.FindCustomerById(ctx, acc.CustomerID)
+		cust, err := s.customerRepo.CustomerRead(ctxDM, acc.CustomerID)
 		if err != nil {
 			ctxDM.Logger.Warn(ctx, "customer not found for account")
 			continue
@@ -89,8 +89,8 @@ func (s *svc) EligibleAccount(
 			LoanID: acc.ID,
 			// AccountNumber: acc,
 			Borrower: securitisation.BorrowerInfo{
-				FullName: cust.FirstName + " " + cust.LastName,
-				Region:   cust.Address.String,
+				FullName: cust.Customer.FirstName + " " + cust.Customer.LastName,
+				Region:   cust.Customer.Address,
 			},
 			Property: securitisation.PropertyInfo{
 				PropertyType: col.PropertyID,

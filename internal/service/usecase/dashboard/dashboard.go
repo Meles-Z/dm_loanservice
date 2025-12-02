@@ -4,7 +4,6 @@ import (
 	"context"
 	ctxDM "dm_loanservice/drivers/utils/context"
 	domain "dm_loanservice/internal/service/domain/dashboard"
-	"fmt"
 	"strconv"
 )
 
@@ -13,21 +12,6 @@ func (s *svc) PortfolioSummary(
 	ctxDM *ctxDM.Context,
 ) (*domain.DashboardResponse, error) {
 
-	fmt.Println("We have reached here")
-
-	fmt.Println("PortfolioSummary called")
-	if s.a == nil {
-		panic("account repo is nil")
-	}
-	if s.inquiries == nil {
-		panic("inquiries wrapper is nil")
-	}
-	if s.product == nil {
-		panic("product wrapper is nil")
-	}
-	if s.task == nil {
-		panic("task repo is nil")
-	}
 	// --- Portfolio metrics ---
 	totalArrears, err := s.a.AccountArrears(ctx)
 	if err != nil {

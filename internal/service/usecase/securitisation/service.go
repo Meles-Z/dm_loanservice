@@ -2,11 +2,11 @@ package securitisation
 
 import (
 	"context"
+	customerpb "dm_loanservice/drivers/customerservice/customerpb"
 	ctxDM "dm_loanservice/drivers/utils/context"
 	"dm_loanservice/internal/service/domain/account"
 	accountflag "dm_loanservice/internal/service/domain/account_flag"
 	"dm_loanservice/internal/service/domain/collateral"
-	"dm_loanservice/internal/service/domain/customer"
 	duediligence "dm_loanservice/internal/service/domain/due_diligence"
 	"dm_loanservice/internal/service/domain/securitisation"
 )
@@ -30,7 +30,7 @@ type Service interface {
 func NewService(
 	securitisationRepo securitisation.Repository,
 	accountRepo account.Repository,
-	customerRepo customer.Repository,
+	customerRepo customerpb.CustomerWrapper,
 	dueDiligenceRepo duediligence.Repository,
 	accountFlagRepo accountflag.Repository,
 	collateralRepo collateral.Repository,
@@ -48,7 +48,7 @@ func NewService(
 type svc struct {
 	securitisationRepo securitisation.Repository
 	accountRepo        account.Repository
-	customerRepo       customer.Repository
+	customerRepo       customerpb.CustomerWrapper
 	dueDiligenceRepo   duediligence.Repository
 	accountflagRepo    accountflag.Repository
 	collateralRepo     collateral.Repository
